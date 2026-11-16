@@ -37,7 +37,13 @@ if (!urls.length) {
 
 let chromium;
 try {
-  ({ chromium } = await import("playwright"));
+  // Chercher Playwright dans le projet courant d'abord (le script vit dans le dossier du skill)
+  const { createRequire } = await import("node:module");
+  const { pathToFileURL } = await import("node:url");
+  let mod;
+  try { mod = await import(pathToFileURL(createRequire(join(process.cwd(), "noop.js")).resolve("playwright")).href); }
+  catch { mod = await import("playwright"); }
+  ({ chromium } = mod.default && mod.default.chromium ? mod.default : mod);
 } catch {
   console.error("Playwright n'est pas installé. Lancez : npm i -D playwright && npx playwright install chromium");
   process.exit(2);
@@ -134,7 +140,12 @@ for (const url of urls) {
   // 4. axe-core
   if (withAxe) {
     try {
-      const { default: AxeBuilder } = await import("@axe-core/playwright");
+      const { createRequire } = await import("node:module");
+      const { pathToFileURL } = await import("node:url");
+      let axeMod;
+      try { axeMod = await import(pathToFileURL(createRequire(join(process.cwd(), "noop.js")).resolve("@axe-core/playwright")).href); }
+      catch { axeMod = await import("@axe-core/playwright"); }
+      const AxeBuilder = axeMod.default?.default || axeMod.default || axeMod.AxeBuilder;
       const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
       entry.axe = res.violations.map((v) => ({ regle: v.id, impact: v.impact, description: v.help, occurrences: v.nodes.length, exemple: v.nodes[0]?.target?.join(" ") }));
     } catch (e) {
