@@ -1,0 +1,16 @@
+{
+  "name": "en-regle",
+  "description": "En règle : le contrôle légal et sécurité de ton site avant (et après) la mise en ligne.",
+  "owner": {
+    "name": "aminem2001",
+    "url": "https://github.com/aminem2001"
+  },
+  "plugins": [
+    {
+      "name": "en-regle",
+      "source": "./",
+      "description": "Audit, tests et corrections de conformité légale (RGPD, cookies, CNIL, mentions légales, CGV, RGAA, DSA, AI Act) et sécurité (OWASP) pour sites et applis.",
+      "version": "1.0.0"
+    }
+  ]
+}
