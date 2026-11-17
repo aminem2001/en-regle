@@ -10,7 +10,7 @@
       "name": "en-regle",
       "source": "./",
       "description": "Audit, tests et corrections de conformité légale (RGPD, cookies, CNIL, mentions légales, CGV, RGAA, DSA, AI Act) et sécurité (OWASP) pour sites et applis.",
-      "version": "1.1.0"
+      "version": "1.1.1"
     }
   ]
 }

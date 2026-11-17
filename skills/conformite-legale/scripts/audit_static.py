@@ -159,10 +159,18 @@ def strip_comments(text, ext):
         text = _LINE.sub(_blank, text)
     return text
 
+# Rapports et documentation du dépôt : jamais des pages du site (sinon le rapport précédent
+# « contient » des CGV, un médiateur… et fausse la détection des pages légales)
+REPORT_FILES = {"conformite.md", "crash-test.md", "couverture.md", "textes-visibles.md", "readme.md", "changelog.md",
+                "contributing.md", "license", "license.md", "security.md", "audit.md", "code_of_conduct.md"}
+
+
 def walk(root):
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and (not d.startswith(".") or d == ".well-known")]
         for name in filenames:
+            if name.lower() in REPORT_FILES:
+                continue
             yield os.path.join(dirpath, name)
 
 

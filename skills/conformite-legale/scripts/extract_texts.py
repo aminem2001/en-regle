@@ -55,6 +55,9 @@ def scan(root, min_words):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith(".")]
         for name in sorted(filenames):
             ext = os.path.splitext(name)[1].lower()
+            if name.lower() in {"conformite.md", "crash-test.md", "couverture.md", "textes-visibles.md", "readme.md",
+                                "changelog.md", "contributing.md", "license.md", "security.md", "audit.md"}:
+                continue
             if ext not in EXTS or name in SKIP_FILES or name.endswith((".min.js", ".d.ts", ".test.ts", ".spec.ts", ".config.js", ".config.ts", ".config.mjs")):
                 continue
             path = os.path.join(dirpath, name)

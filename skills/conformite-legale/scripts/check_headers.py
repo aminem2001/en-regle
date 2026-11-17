@@ -15,6 +15,7 @@ Bibliothèque standard uniquement.
 
 import argparse
 import json
+import re
 import ssl
 import sys
 import urllib.error
@@ -43,6 +44,9 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+CHALLENGE = re.compile(r"(Vercel Security Checkpoint|Just a moment\.\.\.|Attention Required! \| Cloudflare|cf-chl-|challenge-platform|Checking your browser|DDoS protection by|_Incapsula_Resource|px-captcha|perimeterx)", re.I)
+
+
 def fetch(url, follow=True):
     handlers = [] if follow else [NoRedirect()]
     opener = urllib.request.build_opener(*handlers, urllib.request.HTTPSHandler(context=ssl.create_default_context()))
@@ -65,6 +69,12 @@ def check(url, probe_files):
     except Exception as e:
         return {"url": url, "erreur": f"Site injoignable : {e}", "constats": []}
     info.update({"statut": status, "url_finale": final_url})
+    # Page de protection anti-robots (Vercel, Cloudflare…) : les en-têtes reçus sont ceux du contrôle, pas du site
+    if CHALLENGE.search(body.decode("utf-8", "ignore")):
+        return {"url": url, "statut": status, "url_finale": final_url, "bloque_anti_robots": True,
+                "erreur": "Réponse = page de protection anti-robots (Vercel Security Checkpoint, Cloudflare…). "
+                          "Les en-têtes reçus ne sont pas ceux du site : tester la version de production en local "
+                          "(build + start) ou désactiver temporairement la protection.", "constats": []}
     final = urllib.parse.urlparse(final_url)
 
     if final.scheme != "https" and not is_local:

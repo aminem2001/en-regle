@@ -171,6 +171,12 @@ def strip_comments(text, ext):
         text = _LINE.sub(_blank, text)
     return text
 
+# Rapports et documentation du dépôt : jamais des pages du site (sinon le rapport précédent
+# « contient » des CGV, un médiateur… et fausse la détection des pages légales)
+REPORT_FILES = {"conformite.md", "crash-test.md", "couverture.md", "textes-visibles.md", "readme.md", "changelog.md",
+                "contributing.md", "license", "license.md", "security.md", "audit.md", "code_of_conduct.md"}
+
+
 def iter_files(root):
     for dirpath, dirnames, filenames in os.walk(root):
         rel = os.path.relpath(dirpath, root)
@@ -182,6 +188,8 @@ def iter_files(root):
             path = os.path.join(dirpath, name)
             ext = os.path.splitext(name)[1].lower()
             if ext in TEXT_EXT or name in SPECIAL_FILES or name.startswith(".env"):
+                if name.lower() in REPORT_FILES:
+                    continue
                 if name.endswith(".min.js") or name in {"package-lock.json", "yarn.lock", "pnpm-lock.yaml"}:
                     continue
                 try:

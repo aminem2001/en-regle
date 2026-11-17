@@ -67,6 +67,8 @@ function thirdPartyOf(requests, pageUrl) {
 const browser = await chromium.launch();
 const report = [];
 
+const CHALLENGE_SRC = String.raw`(Vercel Security Checkpoint|Just a moment\.\.\.|Attention Required! \| Cloudflare|cf-chl-|challenge-platform|Checking your browser|DDoS protection by|_Incapsula_Resource|px-captcha|perimeterx)`;
+
 for (const url of urls) {
   const context = await browser.newContext({ locale: "fr-FR" });
   const page = await context.newPage();
@@ -88,6 +90,16 @@ for (const url of urls) {
     }
   }
   await page.waitForTimeout(1500);
+
+  // Page de protection anti-robots (Vercel, Cloudflare…) : on n'analyse pas la page de contrôle à la place du site
+  const blocked = await page.evaluate((rx) => new RegExp(rx, "i").test(document.title + " " + document.documentElement.outerHTML.slice(0, 20000)), CHALLENGE_SRC).catch(() => false);
+  if (blocked) {
+    entry.bloque_anti_robots = true;
+    await page.screenshot({ path: join(outDir, `${report.length + 1}-bloque.png`), fullPage: false }).catch(() => {});
+    report.push(entry);
+    await context.close();
+    continue;
+  }
 
   // 1. Avant consentement
   const cookiesBefore = await context.cookies();
@@ -183,6 +195,7 @@ for (const e of report) {
   const av = e.avant_consentement;
   console.log(`\n# ${e.url}`);
   if (e.inaccessible) { console.log(`❓ Page inaccessible, aucun test réalisé : ${e.avertissement}`); continue; }
+  if (e.bloque_anti_robots) { console.log("❓ Page bloquée par une protection anti-robots (Vercel Security Checkpoint, Cloudflare…) : aucun test réalisé. Tester la version de production en local (build + start)."); continue; }
   if (e.avertissement) console.log(`⚠️ ${e.avertissement}`);
   console.log(`Cookies avant consentement : ${av.cookies.map((c) => c.nom).join(", ") || "aucun"}`);
   console.log(`Requêtes vers des traceurs avant consentement : ${av.requetes_traceurs.length ? "🔴 " + av.requetes_traceurs.length : "✅ aucune"}`);
