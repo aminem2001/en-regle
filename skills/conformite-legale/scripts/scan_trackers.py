@@ -82,7 +82,8 @@ SERVICES = [
      r"hcaptcha\.com|challenges\.cloudflare\.com/turnstile|friendlycaptcha"),
     ("intercom", "Chat / support (Intercom, Crisp, HubSpot, Zendesk, Tawk, Tidio)", "Support", "oui en général",
      r"widget\.intercom\.io|intercom|client\.crisp\.chat|js\.hs-scripts\.com|hubspot|zdassets\.com|embed\.tawk\.to|tidio"),
-    ("stripe", "Stripe", "Paiement", "non (fonction de paiement)", r"js\.stripe\.com|@stripe/|\bstripe\b"),
+    ("stripe", "Stripe", "Paiement", "non (fonction de paiement)",
+     r"js\.stripe\.com|@stripe/|(?:from|require\(|import\(?)\s*['\"]stripe['\"]|['\"]stripe['\"]\s*:|STRIPE_(?:SECRET|PUBLISHABLE)"),
     ("paypal", "PayPal", "Paiement", "non (fonction de paiement)", r"paypal\.com/sdk|@paypal/"),
     ("lemonsqueezy", "Paddle / Lemon Squeezy / Mollie / PayPlug", "Paiement", "non (fonction de paiement)",
      r"paddle\.com|lemonsqueezy|mollie|payplug"),
@@ -95,7 +96,10 @@ SERVICES = [
     ("mailchimp", "Mailchimp / Brevo / Mailerlite / ConvertKit (newsletter)", "Prospection e-mail", "consentement à la collecte",
      r"mailchimp|list-manage\.com|sendinblue|brevo|mailerlite|convertkit|kit\.com"),
     ("ai", "Fournisseur d'IA (OpenAI, Anthropic, Mistral, Google, Vercel AI SDK…)", "Intelligence artificielle", "AI Act art. 50 + RGPD",
-     r"\bopenai\b|@anthropic-ai|anthropic\.com/v1|api\.openai\.com|mistralai|@google/generative-ai|@google/genai|from ['\"]ai['\"]|@ai-sdk/|langchain"),
+     # Vraies intégrations seulement (import, dépendance, API) — pas un nom cité dans un texte
+     r"@anthropic-ai/|anthropic\.com/v1|api\.openai\.com|api\.mistral\.ai|@google/generative-ai|@google/genai|@ai-sdk/|@langchain/"
+     r"|(?:from|require\(|import\(?)\s*['\"](?:openai|mistralai|@mistralai/[\w-]+|ai|langchain)['\"]"
+     r"|['\"](?:openai|mistralai|langchain)['\"]\s*:|(?:OPENAI|ANTHROPIC|MISTRAL)_API_KEY"),
 ]
 
 CMP = [
@@ -137,10 +141,35 @@ CHECKS = [
     ("localstorage", "localStorage / sessionStorage (traceur si non nécessaire)", r"localStorage\.setItem|sessionStorage\.setItem"),
     ("document-cookie", "Écriture directe de cookie", r"document\.cookie\s*="),
     ("pay-button", "Bouton de paiement : libellé à vérifier (« Commander avec obligation de paiement »)",
-     r"commander avec obligation de paiement|payer maintenant|valider (la |ma )?commande|place order|checkout"),
+     # Libellés de bouton seulement (texte affiché ou chaîne exacte), pas un nom de fichier comme checkout.spec.ts
+     r"commander avec obligation de paiement|payer maintenant|valider (?:la |ma )?commande|place order"
+     r"|>\s*(?:proceed to )?checkout\s*<|['\"`](?:proceed to )?checkout['\"`]\s*[,)}\]]"),
     ("lang", "Attribut lang présent sur <html> (vérifier qu il vaut fr si le site vise la France)", r"<html[^>]*\blang="),
 ]
 
+
+
+# --- Commentaires : remplacés par des espaces (numéros de ligne conservés) pour éviter les faux positifs
+_C_LIKE = {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".css", ".scss", ".sass", ".less", ".vue", ".svelte",
+           ".astro", ".java", ".kt", ".swift", ".dart", ".go", ".php", ".cs", ".c", ".cpp", ".rs"}
+_HTML_LIKE = {".html", ".htm", ".vue", ".svelte", ".astro", ".php", ".twig", ".hbs", ".ejs", ".njk", ".liquid", ".blade.php"}
+_BLOCK = re.compile(r"/\*.*?\*/", re.S)
+_LINE = re.compile(r"(?<![:\"'`\w(=/\\])//[^\n]*")
+_HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+
+
+def _blank(m):
+    return re.sub(r"[^\n]", " ", m.group(0))
+
+
+def strip_comments(text, ext):
+    """Neutralise les commentaires sans changer les numéros de ligne."""
+    if ext in _HTML_LIKE:
+        text = _HTML_COMMENT.sub(_blank, text)
+    if ext in _C_LIKE:
+        text = _BLOCK.sub(_blank, text)
+        text = _LINE.sub(_blank, text)
+    return text
 
 def iter_files(root):
     for dirpath, dirnames, filenames in os.walk(root):
@@ -178,6 +207,7 @@ def scan(root):
         try:
             with open(path, "r", encoding="utf-8", errors="ignore") as fh:
                 content = fh.read()
+            content = strip_comments(content, os.path.splitext(path)[1].lower())
         except OSError:
             continue
         files_scanned += 1

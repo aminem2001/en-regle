@@ -79,6 +79,13 @@ for (const url of urls) {
   } catch (e) {
     await page.waitForTimeout(3000);
     entry.avertissement = `Chargement incomplet : ${e.message.split("\n")[0]}`;
+    // Page jamais chargée (serveur arrêté, DNS, certificat) : aucun résultat n'est fiable
+    if (/ERR_(CONNECTION|NAME_NOT_RESOLVED|ADDRESS|CERT|SSL)|net::ERR_/.test(e.message)) {
+      entry.inaccessible = true;
+      report.push(entry);
+      await context.close();
+      continue;
+    }
   }
   await page.waitForTimeout(1500);
 
@@ -110,11 +117,14 @@ for (const url of urls) {
       bandeau_reaffiche: await page.getByRole("button", { name: REFUSE }).first().isVisible().catch(() => false),
     };
   } else {
-    entry.apres_refus = { bouton_refuser_trouve: false };
+    // Sans cookie ni traceur, aucun consentement n'est à recueillir : l'absence de bouton n'est pas un défaut
+    const rienARefuser = cookiesBefore.length === 0 && entry.avant_consentement.requetes_traceurs.length === 0;
+    entry.apres_refus = { bouton_refuser_trouve: false, sans_objet: rienARefuser };
   }
 
   // 3. Clavier
   const steps = [];
+  let devtoolSeen = false;
   await page.keyboard.press("Escape").catch(() => {});
   await page.evaluate(() => document.activeElement && document.activeElement.blur());
   for (let i = 0; i < 40; i++) {
@@ -122,12 +132,16 @@ for (const url of urls) {
     const s = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el === document.body) return null;
+      // Outils de développement (Next.js, Vite, Astro, Nuxt…) : absents en production, à ignorer
+      const DEV = /^(nextjs-portal|vite-error-overlay|astro-dev-toolbar|nuxt-devtools|vue-devtools|react-devtools|svelte-inspector)/i;
+      if (DEV.test(el.tagName) || /^__next|^__nuxt-devtools|^astro-dev/.test(el.id || "")) return { devtool: true };
       const cs = getComputedStyle(el);
       const visibleFocus = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) > 0) || (cs.boxShadow && cs.boxShadow !== "none");
       const r = el.getBoundingClientRect();
       return { element: el.tagName.toLowerCase() + (el.id ? "#" + el.id : ""), texte: (el.innerText || el.getAttribute("aria-label") || "").trim().slice(0, 40), focus_visible: visibleFocus, hors_ecran: r.bottom < 0 || r.top > innerHeight * 3 };
     });
     if (!s) continue;
+    if (s.devtool) { devtoolSeen = true; continue; }
     steps.push(s);
     if (steps.length > 3 && steps.slice(-3).every((x) => x.element === s.element && x.texte === s.texte)) break;
   }
@@ -136,6 +150,8 @@ for (const url of urls) {
     sans_focus_visible: steps.filter((s) => !s.focus_visible).map((s) => `${s.element} « ${s.texte} »`).slice(0, 20),
     piege_possible: steps.length > 5 && new Set(steps.slice(-6).map((s) => s.element + s.texte)).size <= 2,
   };
+  // Serveur de développement : les en-têtes et scripts diffèrent de la production
+  entry.serveur_dev = devtoolSeen || await page.evaluate(() => !!document.querySelector("nextjs-portal, vite-error-overlay, astro-dev-toolbar, script[src*='/@vite/client'], script[src*='webpack-hmr']")).catch(() => false);
 
   // 4. axe-core
   if (withAxe) {
@@ -149,7 +165,7 @@ for (const url of urls) {
       const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
       entry.axe = res.violations.map((v) => ({ regle: v.id, impact: v.impact, description: v.help, occurrences: v.nodes.length, exemple: v.nodes[0]?.target?.join(" ") }));
     } catch (e) {
-      entry.axe = { erreur: "Installer @axe-core/playwright pour activer --axe" };
+      entry.axe = { erreur: "Installer @axe-core/playwright dans le même dossier que Playwright (npm i -D @axe-core/playwright), puis relancer depuis ce dossier" };
     }
   }
 
@@ -166,12 +182,15 @@ writeFileSync(outFile, JSON.stringify(report, null, 2));
 for (const e of report) {
   const av = e.avant_consentement;
   console.log(`\n# ${e.url}`);
+  if (e.inaccessible) { console.log(`❓ Page inaccessible, aucun test réalisé : ${e.avertissement}`); continue; }
   if (e.avertissement) console.log(`⚠️ ${e.avertissement}`);
   console.log(`Cookies avant consentement : ${av.cookies.map((c) => c.nom).join(", ") || "aucun"}`);
   console.log(`Requêtes vers des traceurs avant consentement : ${av.requetes_traceurs.length ? "🔴 " + av.requetes_traceurs.length : "✅ aucune"}`);
-  console.log(`Bouton Refuser : ${e.apres_refus.bouton_refuser_trouve ? "trouvé" : "🔴 introuvable"}`);
+  console.log(`Bouton Refuser : ${e.apres_refus.bouton_refuser_trouve ? "trouvé" : e.apres_refus.sans_objet ? "➖ sans objet (aucun cookie ni traceur à refuser)" : "🔴 introuvable"}`);
   if (e.apres_refus.bouton_refuser_trouve) console.log(`Traceurs après refus : ${e.apres_refus.requetes_traceurs.length ? "🔴 " + e.apres_refus.requetes_traceurs.length : "✅ aucun"}`);
   console.log(`Clavier : ${e.clavier.elements_atteints} éléments, ${e.clavier.sans_focus_visible.length} sans focus visible${e.clavier.piege_possible ? ", 🔴 piège possible" : ""}`);
   if (Array.isArray(e.axe)) console.log(`axe : ${e.axe.length} règles en échec`);
+  else if (e.axe?.erreur) console.log(`axe : ⚠️ ${e.axe.erreur}`);
+  if (e.serveur_dev) console.log("⚠️ Serveur de développement détecté : refaire les tests d'en-têtes et de scripts sur la version de production (build + start)");
 }
 console.log(`\nRapport complet : ${outFile}`);

@@ -127,12 +127,37 @@ RULES = [
 MULTILINE_RULES = {"img-no-alt", "html-no-lang", "empty-button", "div-click", "autoplay",
                    "input-placeholder-only", "prechecked", "cdn-no-sri"}
 
+JSONLD_SAFE = re.compile(r"application/ld\+json", re.I)
+TABINDEX_MINUS1 = re.compile(r"tabIndex=\{\s*-1\s*\}|tabindex=['\"]-1['\"]", re.I)
 EMAIL_HINT = re.compile(r"(email|mail|newsletter|campaign|marketing)", re.I)
 UNSUB = re.compile(r"unsubscribe|d[ée]sinscri|d[ée]sabonn|se d[ée]sinscrire|List-Unsubscribe|\{\{\s*unsubscribe|\*\|UNSUB\|\*|\[unsubscribe\]", re.I)
 MARKETING_HINT = re.compile(r"promo|offre|newsletter|nouveaut|soldes|discount|campaign|marketing|r[ée]duction|-\d+\s?%", re.I)
 FONT_PRO = re.compile(r"@fortawesome/(pro-|fontawesome-pro)|kit\.fontawesome\.com|use\.typekit\.net|fonts\.adobe\.com", re.I)
 RISKY_LICENSES = re.compile(r"\b(A?GPL|LGPL|SSPL|BUSL|CC-BY-NC|UNLICENSED|Commercial|Proprietary)\b", re.I)
 
+
+
+# --- Commentaires : remplacés par des espaces (numéros de ligne conservés) pour éviter les faux positifs
+_C_LIKE = {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".css", ".scss", ".sass", ".less", ".vue", ".svelte",
+           ".astro", ".java", ".kt", ".swift", ".dart", ".go", ".php", ".cs", ".c", ".cpp", ".rs"}
+_HTML_LIKE = {".html", ".htm", ".vue", ".svelte", ".astro", ".php", ".twig", ".hbs", ".ejs", ".njk", ".liquid", ".blade.php"}
+_BLOCK = re.compile(r"/\*.*?\*/", re.S)
+_LINE = re.compile(r"(?<![:\"'`\w(=/\\])//[^\n]*")
+_HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+
+
+def _blank(m):
+    return re.sub(r"[^\n]", " ", m.group(0))
+
+
+def strip_comments(text, ext):
+    """Neutralise les commentaires sans changer les numéros de ligne."""
+    if ext in _HTML_LIKE:
+        text = _HTML_COMMENT.sub(_blank, text)
+    if ext in _C_LIKE:
+        text = _BLOCK.sub(_blank, text)
+        text = _LINE.sub(_blank, text)
+    return text
 
 def walk(root):
     for dirpath, dirnames, filenames in os.walk(root):
@@ -198,6 +223,7 @@ def audit(root, max_per_rule):
     gitignore_env = False
     files_scanned = 0
     has_focus_visible = False
+    safe_jsonld = []
 
     gi = os.path.join(root, ".gitignore")
     if os.path.isfile(gi):
@@ -228,6 +254,8 @@ def audit(root, max_per_rule):
         if FONT_PRO.search(content):
             font_pro_hits.append(rel)
 
+        original_lines = content.splitlines()
+        content = strip_comments(content, ext)
         lines = content.splitlines()
         for rid, pt, sev, label, rx in compiled:
             # Les secrets dans les .env non commités sont normaux : on les traite à part.
@@ -241,16 +269,25 @@ def audit(root, max_per_rule):
                     f["total"] += 1
                     if len(f["occurrences"]) < max_per_rule:
                         line_no = content.count("\n", 0, m.start()) + 1
-                        snippet = " ".join(m.group(0).split())
+                        snippet = " ".join(original_lines[line_no - 1].split()) if line_no <= len(original_lines) else " ".join(m.group(0).split())
                         f["occurrences"].append({"fichier": rel, "ligne": line_no, "extrait": snippet[:160]})
                 continue
             for i, line in enumerate(lines, 1):
                 if len(line) > 3000:
                     continue
                 if rx.search(line):
+                    window = "\n".join(lines[max(0, i - 4):i + 3])
+                    # JSON-LD statique échappé (recommandation Next.js) : pas une faille XSS
+                    if rid == "xss-sink" and JSONLD_SAFE.search(window) and re.search(r"JSON\.stringify", window) \
+                            and re.search(r"replace\([^)]*<", window):
+                        safe_jsonld.append(f"{rel}:{i}")
+                        continue
+                    # Cible de focus programmatique (tabIndex=-1) : pas un élément atteignable au clavier
+                    if rid == "outline-none" and TABINDEX_MINUS1.search(window):
+                        continue
                     f["total"] += 1
                     if len(f["occurrences"]) < max_per_rule:
-                        f["occurrences"].append({"fichier": rel, "ligne": i, "extrait": line.strip()[:160]})
+                        f["occurrences"].append({"fichier": rel, "ligne": i, "extrait": original_lines[i - 1].strip()[:160]})
 
         # E-mails marketing sans lien de désinscription
         if EMAIL_HINT.search(rel) and ext in {".html", ".htm", ".tsx", ".jsx", ".mjml", ".hbs", ".njk", ".ejs", ".liquid", ".twig", ".vue"}:
@@ -289,6 +326,10 @@ def audit(root, max_per_rule):
         extra.append({"point": "24", "gravite": "info",
                       "constat": f"{len(images)} images matricielles : vérifier la provenance et la licence (photos de banque, droit à l'image)",
                       "occurrences": images[:15]})
+    if safe_jsonld:
+        extra.append({"point": "S5", "gravite": "info",
+                      "constat": "Données structurées JSON-LD insérées en HTML brut mais échappées (JSON.stringify + remplacement de « < ») : sûr si le contenu n'est pas fourni par un visiteur",
+                      "occurrences": safe_jsonld[:10]})
     if deps:
         extra.append({"point": "24", "gravite": "moyenne",
                       "constat": "Dépendances avec une licence contraignante ou absente (GPL/AGPL/non commerciale/aucune)",

@@ -44,7 +44,29 @@ python3 <skill>/scripts/audit_static.py <projet>     # accessibilité, sécurit�
 
 Puis audite les dépendances avec l'outil de la stack (`npm audit --omit=dev`, `pnpm audit`, `pip-audit`, `composer audit`…). Si `gitleaks` ou `trufflehog` sont installés, lance-les aussi.
 
-Les scripts donnent des indices : **lis chaque occurrence importante** pour confirmer ou écarter. Complète par une lecture ciblée de ce qu'un script ne voit pas : textes des pages légales existantes (exactes ? complètes ?), parcours de commande, de résiliation, de suppression de compte, contrôle d'accès des routes API, gestion des webhooks, gabarits d'e-mails.
+Les scripts donnent des indices : **lis chaque occurrence importante** pour confirmer ou écarter. Les commentaires du code sont ignorés et les mots cités dans un texte (« OpenAI », « checkout ») ne comptent pas comme une intégration ; un constat restant peut quand même être un faux positif : écarte-le en le disant, ne le recopie pas tel quel dans le rapport.
+
+## Étape 2 bis — Lecture intégrale (obligatoire)
+
+Un script ne comprend pas le sens d'une phrase. **Chaque texte visible et chaque traitement de données doit être lu par toi**, pas échantillonné.
+
+1. **Inventaire des textes** :
+   ```bash
+   python3 <skill>/scripts/extract_texts.py <projet> --out textes-visibles.md
+   ```
+   Il liste, fichier par fichier et ligne par ligne, toutes les phrases affichées (pages, composants, traductions, attributs `alt`/`aria-label`/`placeholder`, métadonnées, e-mails). Lis **toutes** les lignes, dans toutes les langues du site.
+2. **Pour chaque phrase**, cherche :
+   - **Allégation non prouvable** (point 23) : chiffres, scores, « garanti », « n°1 », délais promis, taille de l'entreprise (« notre équipe » pour un indépendant), certifications, clients ou résultats cités.
+   - **Promesse contractuelle** : « devis gratuit sous 48 h », « remboursé », « sans engagement » — elle engage l'éditeur et doit être tenable et cohérente avec les CGV.
+   - **Mentions obligatoires** (points 1, 7, 19) : comparer **mot à mot** avec l'immatriculation (Kbis/INSEE : nom, forme, adresse de l'établissement, RCS/RNE, TVA). Une adresse ou un RCS différent du Kbis est un constat.
+   - **Dark patterns et pression** (point 21) : urgence, rareté, culpabilisation, consentement forcé.
+   - **Accessibilité du libellé** (points 26, 29) : nom accessible cohérent avec le texte visible, liens explicites, langue.
+   - **Marques et contenus tiers** (point 24) : logos, noms de marques, images, citations.
+3. **Cartographie des données (RGPD/CNIL)** : liste **chaque** collecte ou envoi de données dans le code — formulaires, `fetch`/appels serveur, API tierces, e-mails, journaux (`console.log`, logger), adresse IP (limitation, statistiques), `localStorage`/`sessionStorage`/cookies, polices et scripts externes. Puis vérifie dans **les deux sens** :
+   - tout ce que fait le code figure dans la politique de confidentialité (finalité, base légale, durée, destinataire, transfert hors UE) ;
+   - tout ce que dit la politique existe réellement dans le code (une politique qui décrit un traitement inexistant est elle-même inexacte).
+4. **Accessibilité (RGAA)** : au-delà d'axe-core, vérifie à la lecture du code les critères qu'aucun outil automatique ne couvre : animations et contenus en mouvement (pause, `prefers-reduced-motion`), alternatives des contenus non textuels, ordre de lecture, messages d'erreur des formulaires, changements de contexte, textes en image.
+5. Note dans le rapport la section **« Lecture intégrale »** : nombre de fichiers et de textes relus, et chaque constat avec `fichier:ligne`. Ne conclus pas sur un point légal tant que cette lecture n'est pas faite.
 
 ## Étape 3 — Tester le site en fonctionnement
 
@@ -56,7 +78,10 @@ Les tests en navigateur sont **obligatoires** pour les points 9, 10, 11, 27 et 2
    - **Outil navigateur de la session** (navigateur intégré, Claude in Chrome, Playwright MCP, DevTools MCP) : ouvre le site dans une session sans cookies, exécute le contenu de `scripts/browser_probe.js` comme expression JavaScript sur chaque page clé, lis les cookies et les requêtes réseau, clique sur « Refuser », recommence ; teste la touche Tab sur la page d'accueil, le bandeau, un formulaire et le tunnel de commande.
    - **Aucun navigateur** : demande à l'utilisateur de coller `browser_probe.js` dans la console de son navigateur en navigation privée et de te renvoyer le résultat.
 3. **Pages à tester au minimum** : accueil, une page de contenu, formulaire de contact ou d'inscription, fiche produit, panier et étape de paiement (sans payer), espace compte, pages légales.
-4. **Tester les en-têtes HTTP** : `python3 <skill>/scripts/check_headers.py <url>` (ajouter `--probe-files` pour vérifier que `.env` et `.git` ne sont pas servis).
+   - `live_check.mjs` cherche Playwright et `@axe-core/playwright` **dans le dossier courant** : installe-les au même endroit (`npm i -D playwright @axe-core/playwright && npx playwright install chromium`) et lance le script depuis ce dossier.
+   - S'il n'y a **ni cookie ni requête vers un traceur**, l'absence de bouton « Refuser » est normale : le script l'affiche « ➖ sans objet ».
+   - Les éléments des outils de développement (barre Next.js, Vite, Astro…) sont ignorés au test clavier. Si le script signale un **serveur de développement**, refais les tests d'en-têtes et de scripts sur la version de production (`build` puis `start`/`preview`), car la politique de sécurité et les scripts y sont différents.
+4. **Tester les en-têtes HTTP** : `python3 <skill>/scripts/check_headers.py <url>` (ajouter `--probe-files` pour vérifier que `.env` et `.git` ne sont pas servis). De préférence sur la version de production, pas sur le serveur de développement.
 5. **Contrastes** à corriger : `python3 <skill>/scripts/contrast.py <texte> <fond>` donne le ratio et une couleur conforme proche.
 
 ## Étape 4 — Évaluer selon la grille
@@ -88,7 +113,7 @@ Lis `references/checklist.md` : **30 points légaux + 15 points sécurité**. É
 # Audit de conformité — [projet]
 
 _Date : AAAA-MM-JJ · Périmètre : [type, B2C/B2B, pays] · Droit appliqué : France / UE [+ pays]_
-_Tests réalisés : analyse du code ✅ · navigateur [✅ / ❓ raison] · en-têtes HTTP [✅ / ❓] · dépendances [✅ / ❓]_
+_Tests réalisés : analyse du code ✅ · lecture intégrale [✅ N textes / ❓] · navigateur [✅ / ❓ raison] · en-têtes HTTP [✅ prod / ⚠️ dev / ❓] · dépendances [✅ / ❓]_
 
 ## Résumé
 [Niveau global en 3 à 5 phrases. Nombre de ❌ et de ⚠️. Peut-on mettre en ligne en l'état ?]
@@ -110,6 +135,9 @@ _Tests réalisés : analyse du code ✅ · navigateur [✅ / ❓ raison] · en-t
 
 ## Traceurs et services tiers
 | Service | Domaine | Chargé avant consentement ? | Consentement requis ? | Action |
+
+## Lecture intégrale
+[Fichiers et textes relus (nombre), cartographie des données dans les deux sens (code → politique, politique → code), constats avec fichier:ligne.]
 
 ## Hypothèses
 ## À fournir par vous
@@ -149,7 +177,7 @@ Applique les corrections validées en suivant `references/corrections.md`, dans 
 
 ## Étape 7 — Retester et clôturer
 
-Relance **les mêmes tests** qu'aux étapes 2 et 3 (scripts, navigateur, en-têtes). Une correction n'est ✅ que si le retest le confirme. Puis mets à jour `CONFORMITE.md` :
+Relance **les mêmes tests** qu'aux étapes 2, 2 bis et 3 (scripts, relecture des textes modifiés, navigateur, en-têtes). Une correction n'est ✅ que si le retest le confirme. Puis mets à jour `CONFORMITE.md` :
 - ajoute une section **« Avant / après »** : tableau des points corrigés avec l'ancien et le nouveau statut, et la preuve du retest (par exemple « 0 requête vers google-analytics.com avant consentement ») ;
 - liste les marqueurs `[À COMPLÉTER]` restants (`grep -rn "À COMPLÉTER"`) ;
 - liste ce qui reste à faire hors code.

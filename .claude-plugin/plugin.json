@@ -1,6 +1,6 @@
 {
   "name": "en-regle",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Ton site est-il en règle ? Audite, teste dans un vrai navigateur et corrige la conformité légale (RGPD, cookies CNIL, mentions légales, CGV, RGAA, DSA, AI Act) et la sécurité (OWASP Top 10 2025) — France, UE et monde.",
   "author": {
     "name": "aminem2001",
