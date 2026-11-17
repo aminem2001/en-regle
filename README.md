@@ -34,7 +34,7 @@ Et Claude déroule tout le cycle, sur **ton** projet, dans **ta** stack :
 ```
  🔍 Analyse le code
  🧪 Teste le site dans un vrai navigateur
- 📋 Te remet un rapport clair, point par point
+ 📋 Te remet un rapport simple, sans jargon
  ✋ Attend ton feu vert        ← rien n'est modifié sans ton accord
  🔧 Corrige
  ✅ Reteste et prouve que c'est corrigé
@@ -63,7 +63,15 @@ Sur un site de démonstration piégé, voici une partie de ce que les outils du 
 🟠 Vidéo YouTube et Google Fonts chargés sans consentement
 ```
 
-Puis il te propose les **5 corrections les plus urgentes**, dans l'ordre, et les applique quand tu dis go.
+Puis il te remet un rapport `CONFORMITE.md` **lisible sans être développeur ni juriste** :
+
+- **En bref** : le verdict en une phrase (« le site peut rester en ligne ? »).
+- **Ce qu'il reste à faire** : actions numérotées et classées 🔴 urgent · 🟠 important · 🟡 conseillé, avec pour chacune le pourquoi et qui s'en charge (toi ou Claude).
+- **Tout ce qui est bon** : chaque point conforme, groupé par thème.
+- **Ne concerne pas ton site** et **Ce qui a été corrigé**.
+- Les détails techniques (fichiers, lignes, grille complète) sont dans une section repliée, pour un développeur.
+
+Tu dis « corrige 1 à 4 » ou « corrige tout », et il applique, reteste et met le rapport à jour.
 
 ## 🧾 La grille : 45 points
 

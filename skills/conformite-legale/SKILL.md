@@ -68,7 +68,7 @@ Un script ne comprend pas le sens d'une phrase. **Chaque texte visible et chaque
    - tout ce que fait le code figure dans la politique de confidentialité (finalité, base légale, durée, destinataire, transfert hors UE) ;
    - tout ce que dit la politique existe réellement dans le code (une politique qui décrit un traitement inexistant est elle-même inexacte).
 4. **Accessibilité (RGAA)** : au-delà d'axe-core, vérifie à la lecture du code les critères qu'aucun outil automatique ne couvre : animations et contenus en mouvement (pause, `prefers-reduced-motion`), alternatives des contenus non textuels, ordre de lecture, messages d'erreur des formulaires, changements de contexte, textes en image.
-5. Note dans le rapport la section **« Lecture intégrale »** : nombre de fichiers et de textes relus, et chaque constat avec `fichier:ligne`. Ne conclus pas sur un point légal tant que cette lecture n'est pas faite.
+5. Note dans la section technique repliée du rapport le nombre de fichiers et de textes relus et chaque constat avec `fichier:ligne` ; dans la partie principale, chaque constat devient une action en mots simples. Ne conclus pas sur un point légal tant que cette lecture n'est pas faite.
 
 ## Étape 3 — Tester le site en fonctionnement
 
@@ -110,54 +110,91 @@ Lis `references/checklist.md` : **30 points légaux + 15 points sécurité**. É
 
 ## Étape 5 — Rapport, puis STOP
 
-Écris `CONFORMITE.md` à la racine du projet avec **exactement** cette structure (comparable d'un audit à l'autre) :
+Écris `CONFORMITE.md` à la racine du projet. **Le rapport s'adresse au propriétaire du site, pas à un développeur** : phrases courtes en français courant, aucun jargon dans la partie principale (pas de numéro de point, de chemin de fichier, de nom d'article de loi ou de sigle non expliqué). Tous les détails techniques vont dans la section repliée en bas. Utilise **exactement** cette structure (comparable d'un audit à l'autre) :
 
 ```markdown
-# Audit de conformité — [projet]
+# Conformité du site [nom]
 
-_Date : AAAA-MM-JJ · Périmètre : [type, B2C/B2B, pays] · Droit appliqué : France / UE [+ pays]_
-_Tests réalisés : analyse du code ✅ · lecture intégrale [✅ N textes / ❓] · navigateur [✅ / ❓ raison] · en-têtes HTTP [✅ prod / ⚠️ dev / ❓] · dépendances [✅ / ❓]_
+**Dernier contrôle : [date en toutes lettres]** (outil En règle [version])
 
-## Résumé
-[Niveau global en 3 à 5 phrases. Nombre de ❌ et de ⚠️. Peut-on mettre en ligne en l'état ?]
+## En bref
 
-## Les 5 corrections les plus urgentes
-1. [Point n° — problème — correction — pourquoi c'est urgent]
-…
+[🟢 / 🟠 / 🔴] **[Verdict en une phrase : peut-on mettre / laisser le site en ligne ?]** Sur les 45 points contrôlés : **N sont bons**, **N ne concernent pas votre site**, **N demandent une action**, dont N urgente(s).
 
-## Grille légale (30 points)
-| # | Point | Statut | Où (page / fichier:ligne) | Constat | Action | Gravité |
-|---|---|---|---|---|---|---|
-| 1 | Mentions légales | ❌ | — | Aucune page | Créer /mentions-legales (3 infos à fournir) | 🔴 |
+[🔴 Le problème le plus grave en une ou deux phrases, s'il y en a un.]
 
-## Sécurité (15 points)
-| # | Point | Statut | Où | Constat | Action | Gravité |
+---
 
-## Points additionnels
-[Mobile, international, DSA, AI Act, activité réglementée : seulement si applicable.]
+## ⏳ Ce qu'il reste à faire
 
-## Traceurs et services tiers
-| Service | Domaine | Chargé avant consentement ? | Consentement requis ? | Action |
+### 🔴 Urgent
+| N° | À faire | Pourquoi | Qui |
+|---|---|---|---|
+| 1 | **[Action concrète]** | [Conséquence pour l'éditeur, en mots simples : amende, perte de clients…] | [Vous / Claude / Vous + Claude (durée)] |
 
-## Lecture intégrale
-[Fichiers et textes relus (nombre), cartographie des données dans les deux sens (code → politique, politique → code), constats avec fichier:ligne.]
+### 🟠 Important
+[Même tableau, numérotation continue.]
 
-## Hypothèses
-## À fournir par vous
-[Informations d'identité, licences, choix de médiateur…]
-## Hors code (démarches)
-[Registre des traitements, DPA, adhésion au médiateur, révocation de clés exposées…]
-## Points revérifiés en ligne et limites
+### 🟡 Conseillé
+[Même tableau, numérotation continue.]
+
+### 📌 À respecter au quotidien
+[Règles qui conditionnent la conformité (ex. « clientèle professionnelle uniquement ») et règles à connaître pour une activité future probable (prospection, newsletter…). Omettre si rien.]
+
+---
+
+## ✅ Tout ce qui est bon
+
+### [Thème : Pages légales / Données personnelles (RGPD) / Cookies et pistage / Textes et pratiques commerciales / Vente en ligne / Accessibilité / Sécurité…]
+- ✅ **[Ce qui est conforme]** : [preuve en une phrase simple].
+
+[Un thème par groupe de points ✅ ; liste TOUS les points conformes, pas un échantillon.]
+
+---
+
+## ➖ Ne concerne pas votre site (N points)
+
+[Liste sur une ligne, séparée par « · », avec la raison entre parenthèses quand elle n'est pas évidente.]
+
+---
+
+## 🛠️ Ce qui a été corrigé
+
+| Date | Correction |
+|---|---|
+[Vide au premier audit : écrire « Rien pour l'instant. »]
+
+---
+
+> **Important :** ce rapport est produit par un outil automatique et relu par une IA. Ce n'est pas un conseil juridique et il ne garantit pas la conformité. Vous restez responsable de votre site. [Quand un juriste est nécessaire pour ce projet, le dire ici.]
+
+<details>
+<summary><b>Comment le contrôle a été fait</b> (pour un développeur)</summary>
+
+- Tests réalisés : analyse du code, lecture intégrale (N textes), navigateur (pages, version testée, ❓ et raison si bloqué), en-têtes HTTP, dépendances.
+- Grille détaillée : tableau `| # | Point | Statut | Où (fichier:ligne) | Constat |` des 30 points légaux et 15 points de sécurité.
+- Traceurs et services tiers : service, domaine, chargé avant consentement, consentement requis.
+- Données collectées : cartographie code → politique et politique → code.
+- Hypothèses, faux positifs écartés, points de `veille.md` revérifiés en ligne, limites.
+
+</details>
 ```
 
+Règles de rédaction :
+- **Chaque point de la grille apparaît une fois** : dans « Ce qu'il reste à faire » (❌, ⚠️, ❓ à vérifier), dans « Tout ce qui est bon » (✅) ou dans « Ne concerne pas votre site » (➖). Les trois nombres de « En bref » doivent faire 45 (plus les points additionnels éventuels).
+- Un point ❓ (non vérifié) va dans « Ce qu'il reste à faire » avec l'action « vérifier… » : ne jamais le présenter comme bon.
+- Les démarches hors code (registre, DPA, médiateur, Kbis, révocation de clé) sont des lignes du tableau d'actions comme les autres, avec « Vous » dans « Qui ».
+- Les informations à fournir (SIRET, hébergeur, médiateur…) apparaissent comme actions « Vous ».
+- Le statut technique (✅ ⚠️ ❌ ➖ ❓) et la gravité restent utilisés dans la grille détaillée repliée.
+
 Statuts : ✅ OK · ⚠️ À améliorer · ❌ Manquant ou non conforme · ➖ Non applicable · ❓ Non vérifié (raison).
-Gravité : 🔴 Bloquant (sanction directe, faille exploitable, contrôle fréquent) · 🟠 Important · 🟡 Recommandé.
+Gravité : 🔴 Urgent (sanction directe, faille exploitable, contrôle fréquent, perte de clients) · 🟠 Important · 🟡 Conseillé.
 
 Classe toujours en 🔴 : traceurs chargés avant consentement, absence de bouton « Refuser » équivalent, mentions légales ou politique de confidentialité absentes, absence d'information sur la rétractation ou de fonction de rétractation pour un site marchand, absence de médiateur, case de consentement pré-cochée, secret exposé, contrôle d'accès absent sur des données personnelles, injection exploitable.
 
-**Ordre des 5 corrections urgentes** : d'abord les failles de sécurité exploitables et les secrets exposés, puis les traceurs sans consentement, puis les informations légales obligatoires manquantes, puis les pratiques trompeuses, puis l'accessibilité bloquante.
+**Ordre dans chaque niveau** : d'abord les failles de sécurité exploitables et les secrets exposés, puis les traceurs sans consentement, puis les informations légales obligatoires manquantes, puis les pratiques trompeuses, puis l'accessibilité bloquante.
 
-Présente ensuite à l'utilisateur un résumé court (statuts globaux, 5 urgences) et **arrête-toi** : demande ce qu'il valide (tout, une sélection de numéros, ou rien) et les informations d'identité manquantes. Ne modifie rien avant sa réponse.
+Présente ensuite à l'utilisateur un résumé court (verdict, actions urgentes et importantes) et **arrête-toi** : demande ce qu'il valide (tout, une sélection de numéros d'actions, ou rien) et les informations d'identité manquantes. Ne modifie rien avant sa réponse.
 
 ## Étape 6 — Corriger (après validation)
 
@@ -180,10 +217,11 @@ Applique les corrections validées en suivant `references/corrections.md`, dans 
 
 ## Étape 7 — Retester et clôturer
 
-Relance **les mêmes tests** qu'aux étapes 2, 2 bis et 3 (scripts, relecture des textes modifiés, navigateur, en-têtes). Une correction n'est ✅ que si le retest le confirme. Puis mets à jour `CONFORMITE.md` :
-- ajoute une section **« Avant / après »** : tableau des points corrigés avec l'ancien et le nouveau statut, et la preuve du retest (par exemple « 0 requête vers google-analytics.com avant consentement ») ;
-- liste les marqueurs `[À COMPLÉTER]` restants (`grep -rn "À COMPLÉTER"`) ;
-- liste ce qui reste à faire hors code.
+Relance **les mêmes tests** qu'aux étapes 2, 2 bis et 3 (scripts, relecture des textes modifiés, navigateur, en-têtes). Une correction n'est faite que si le retest le confirme. Puis mets à jour `CONFORMITE.md` en gardant la même structure :
+- déplace chaque action corrigée de « Ce qu'il reste à faire » vers « Tout ce qui est bon » (ou « Ne concerne pas votre site ») et ajoute une ligne datée dans « Ce qui a été corrigé » ;
+- mets à jour les trois nombres et le verdict de « En bref » ;
+- mets la preuve du retest dans la section technique repliée (par exemple « 0 requête vers google-analytics.com avant consentement ») ;
+- vérifie qu'il ne reste aucun marqueur `[À COMPLÉTER]` affiché aux visiteurs (`grep -rn "À COMPLÉTER"`) ; s'il en reste, ajoute une action « Vous » pour fournir l'information.
 
 Termine par un message court : ce qui a été corrigé et vérifié, ce qui reste à fournir ou à faire, et si le site peut être mis en ligne.
 
