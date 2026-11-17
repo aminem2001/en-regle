@@ -15,9 +15,13 @@ import re
 import sys
 
 SKIP_DIRS = {"node_modules", ".git", ".next", "dist", "build", "out", ".nuxt", ".svelte-kit", ".output",
-             "vendor", "coverage", ".turbo", ".vercel", "Pods", ".dart_tool", "__pycache__", "venv", ".venv"}
+             "vendor", "coverage", ".turbo", ".vercel", "Pods", ".dart_tool", "__pycache__", "venv", ".venv",
+             "target", "bin", "obj", "_build", "deps", "wp-admin", "wp-includes", "storage", "tmp", "migrations", "tests", "test", "spec"}
 EXTS = {".tsx", ".jsx", ".ts", ".js", ".mjs", ".vue", ".svelte", ".astro", ".html", ".htm", ".php", ".twig",
-        ".hbs", ".ejs", ".njk", ".liquid", ".md", ".mdx", ".json", ".yml", ".yaml", ".po", ".arb", ".strings", ".xml"}
+        ".hbs", ".ejs", ".njk", ".liquid", ".md", ".mdx", ".json", ".yml", ".yaml", ".po", ".arb", ".strings", ".xml",
+        ".cshtml", ".razor", ".resx", ".aspx", ".jsp", ".ftl", ".vm", ".jinja", ".jinja2", ".j2", ".tpl", ".mustache",
+        ".handlebars", ".erb", ".eex", ".heex", ".slim", ".haml", ".latte", ".phtml", ".gohtml", ".tmpl", ".properties",
+        ".py", ".rb", ".ex", ".java", ".kt", ".swift", ".dart", ".cs", ".go", ".xliff", ".xlf", ".ini", ".toml", ".marko"}
 SKIP_FILES = {"package.json", "package-lock.json", "tsconfig.json", "composer.json", "composer.lock", "yarn.lock",
               "pnpm-lock.yaml", "manifest.json", ".eslintrc.json"}
 

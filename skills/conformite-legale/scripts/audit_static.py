@@ -24,7 +24,8 @@ SKIP_DIRS = {
     "node_modules", ".git", ".next", ".nuxt", ".svelte-kit", ".output", "dist",
     "build", "out", "coverage", ".cache", ".turbo", ".vercel", ".netlify",
     "vendor", "Pods", ".gradle", "DerivedData", "__pycache__", ".venv", "venv",
-    ".idea", ".vscode", "storybook-static", "target",
+    ".idea", ".vscode", "storybook-static", "target", "bin", "obj", "_build", "deps",
+    "wp-admin", "wp-includes", "var", "storage", "tmp", "log", "logs", "bower_components", "jspm_packages",
 }
 CODE_EXT = {
     ".html", ".htm", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".vue",
@@ -32,6 +33,10 @@ CODE_EXT = {
     ".ejs", ".pug", ".md", ".mdx", ".py", ".rb", ".go", ".css", ".scss",
     ".sass", ".less", ".swift", ".kt", ".java", ".dart", ".json", ".yml",
     ".yaml", ".toml", ".xml", ".plist", ".mjml", ".blade.php",
+    ".cshtml", ".razor", ".cs", ".vb", ".aspx", ".ascx", ".master", ".jsp", ".jspx", ".tag", ".ftl", ".vm",
+    ".jinja", ".jinja2", ".j2", ".tpl", ".mustache", ".handlebars", ".eex", ".heex", ".leex", ".ex", ".exs",
+    ".slim", ".haml", ".latte", ".phtml", ".gohtml", ".tmpl", ".rs", ".scala", ".marko", ".m", ".mm",
+    ".storyboard", ".xib", ".kts", ".gradle", ".config", ".properties", ".ini", ".cfm", ".pl", ".lua",
 }
 FONT_EXT = {".woff", ".woff2", ".ttf", ".otf", ".eot"}
 IMAGE_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif", ".svg"}
@@ -50,7 +55,7 @@ RULES = [
     ("tabindex-positive", "28", "moyenne", "tabindex positif (casse l'ordre de navigation au clavier)",
      r"tabindex\s*=\s*['\"{]?\s*[1-9]", None),
     ("div-click", "28", "moyenne", "Élément non interactif cliquable (div/span onClick) — inaccessible au clavier sans role/tabindex/clavier",
-     r"<(div|span|li|img)\b[^>]*(onClick|@click|v-on:click|on:click)\b", None),
+     r"<(div|span|li|img)\b[^>]*(onClick|@click|v-on:click|on:click|\(click\)|@onclick|x-on:click|wire:click|ng-click)\b", None),
     ("autoplay", "26", "moyenne", "Lecture automatique d'un média (vérifier : pas de son, bouton pause)",
      r"<(video|audio)\b[^>]*\bautoplay\b|autoPlay(\s|=|>)", None),
     ("zoom-blocked", "27", "haute", "Zoom bloqué dans la balise viewport (user-scalable=no ou maximum-scale=1)",
@@ -92,34 +97,53 @@ RULES = [
     ("hardcoded-password", "S12", "haute", "Mot de passe ou secret écrit en dur",
      r"(password|passwd|pwd|secret|api_?key|apikey|token)\s*[:=]\s*['\"][^'\"\s$%{]{6,}['\"]", None),
     ("public-secret-env", "S12", "haute", "Variable publique (exposée au navigateur) qui semble contenir un secret",
-     r"(NEXT_PUBLIC|VITE|PUBLIC|NUXT_PUBLIC|REACT_APP|EXPO_PUBLIC)_\w*(SECRET|PRIVATE|SERVICE_ROLE|PASSWORD|SK_|STRIPE_SECRET|OPENAI|ANTHROPIC)\w*", None),
+     r"(NEXT_PUBLIC|VITE|PUBLIC|NUXT_PUBLIC|REACT_APP|EXPO_PUBLIC|GATSBY|NG_APP)_\w*(SECRET|PRIVATE|SERVICE_ROLE|PASSWORD|SK_|STRIPE_SECRET|OPENAI|ANTHROPIC)\w*", None),
     ("xss-sink", "S5", "haute", "Insertion de HTML brut (risque XSS si le contenu vient d'un utilisateur)",
-     r"dangerouslySetInnerHTML|v-html\s*=|\{@html\s|\.innerHTML\s*=|\{!!\s|\|\s*safe\b|html_safe|\.raw\(|bypassSecurityTrust", None),
+     r"dangerouslySetInnerHTML|v-html\s*=|\{@html\s|\.innerHTML\s*=|\.outerHTML\s*=|insertAdjacentHTML|document\.write\(|\{!!\s|\|\s*safe\b|\|\s*raw\b"
+     r"|html_safe|\.raw\(|\braw\s*\(|<%==|<%-\s|bypassSecurityTrust|\[innerHTML\]|th:utext|Html\.Raw\(|escapeXml\s*=\s*['\"]false"
+     r"|autoescape\s+(false|off)|\{\{\{[^{]|\bnofilter\b|template\.HTML\(|mark_safe\(|\bMarkup\("
+     r"|(echo|print|<\?=)\s*\$_(GET|POST|REQUEST|COOKIE)|\.html\(\s*[\w$.]+\s*\)", None),
     ("eval", "S5", "haute", "Exécution de code dynamique (eval, new Function, exec)",
-     r"\beval\s*\(|new Function\s*\(|child_process|\bexecSync\s*\(|\bos\.system\s*\(|subprocess\.(call|run|Popen)\([^)]*shell\s*=\s*True", None),
+     r"\beval\s*\(|new Function\s*\(|child_process|\bexecSync\s*\(|\bos\.system\s*\(|subprocess\.(call|run|Popen)\([^)]*shell\s*=\s*True"
+     r"|\bshell_exec\s*\(|\bpassthru\s*\(|\bproc_open\s*\(|\b(system|exec|popen)\s*\(\s*\$|create_function\s*\(|\bassert\s*\(\s*\$"
+     r"|Runtime\.getRuntime\(\)\.exec|new ProcessBuilder\(|Process\.Start\(|\binstance_eval\b|\bclass_eval\b|%x\{|\bos\.popen\(", None),
     ("sql-concat", "S5", "haute", "Requête SQL construite par concaténation ou interpolation (injection SQL)",
      r"\b((?-i:SELECT\b[^;\n]{0,120}?\bFROM|INSERT\s+INTO|UPDATE\s+[\w.`\"]+\s+SET|DELETE\s+FROM)|(?-i:select\b[^;\n]{0,120}?\bfrom\s+\w+\s+where|insert\s+into\s+\w+|delete\s+from\s+\w+))\b[^;\n]{0,200}?(['\"`]{1,2}\s*\+\s*[\w(]|\$\{|%s['\"]\s*%|\{[a-z_]\w*\})"
-     r"|\.(\$queryRawUnsafe|\$executeRawUnsafe)\(", None),
+     r"|\.(\$queryRawUnsafe|\$executeRawUnsafe)\("
+     r"|\b(?-i:SELECT|INSERT|UPDATE|DELETE)\b[^;\n]{0,200}?(['\"]\s*\.\s*\$\w|\$_(GET|POST|REQUEST)|#\{)"
+     r"|['\"](?-i:SELECT\b[^'\"\n]*\bFROM|INSERT INTO|UPDATE \w+ SET|DELETE FROM)\b[^'\"\n]*\$[a-zA-Z_]\w*"
+     r"|(execute|query|raw|exec)\(\s*f['\"](?-i:SELECT|INSERT|UPDATE|DELETE)|String\.Format\(\s*\"(?-i:SELECT|INSERT|UPDATE|DELETE)"
+     r"|Sprintf\(\s*\"(?-i:SELECT|INSERT|UPDATE|DELETE)[^\"]*%[sv]|FromSqlRaw\(\s*\$\"|\.extra\(\s*where\s*="
+     r"|\.(where|order|joins|find_by_sql|having|group)\(\s*\"[^\"\n]*#\{|whereRaw\(\s*[\"'][^\"'\n]*\$\w|DB::raw\(\s*[\"'][^\"'\n]*\$\w", None),
     ("weak-hash", "S4", "haute", "Hachage faible (MD5/SHA-1) — interdit pour des mots de passe",
-     r"\bmd5\s*\(|createHash\(\s*['\"](md5|sha1)['\"]|hashlib\.(md5|sha1)\(|\bsha1\s*\(|CryptoJS\.(MD5|SHA1)", None),
-    ("weak-random", "S4", "moyenne", "Math.random() utilisé pour un jeton, un code ou un identifiant (non cryptographique)",
-     r"(token|code|otp|secret|password|reset|nonce|session)\w*\s*[:=][^;\n]*Math\.random", None),
+     r"\bmd5\s*\(|createHash\(\s*['\"](md5|sha1)['\"]|hashlib\.(md5|sha1)\(|\bsha1\s*\(|CryptoJS\.(MD5|SHA1)"
+     r"|MessageDigest\.getInstance\(\s*\"(MD5|SHA-?1)\"|\b(MD5|SHA1)\.Create\(|\b(md5|sha1)\.(New|Sum)\(|Digest::(MD5|SHA1)"
+     r"|\bhash\(\s*['\"](md5|sha1)['\"]", None),
+    ("weak-random", "S4", "moyenne", "Générateur aléatoire non cryptographique (Math.random, rand, random…) utilisé pour un jeton, un code ou un identifiant",
+     r"(token|code|otp|secret|password|reset|nonce|session)\w*\s*[:=][^;\n]*(Math\.random|\bmt_rand\(|\brand\(|\buniqid\("
+     r"|\brandom\.(random|randint|choice|randrange)\(|new Random\(|\bmath/rand\b|\bRandom\.Next\()", None),
     ("cors-wildcard", "S2", "moyenne", "CORS ouvert à toutes les origines",
-     r"Access-Control-Allow-Origin['\"]?\s*[:,]\s*['\"]\*['\"]|origin\s*:\s*['\"]\*['\"]|cors\(\s*\)|CORS_ORIGIN_ALLOW_ALL\s*=\s*True|allow_origins\s*=\s*\[\s*['\"]\*['\"]", None),
+     r"Access-Control-Allow-Origin['\"]?\s*[:,]\s*['\"]\*['\"]|origin\s*:\s*['\"]\*['\"]|cors\(\s*\)|CORS_ORIGIN_ALLOW_ALL\s*=\s*True|CORS_ALLOW_ALL_ORIGINS\s*=\s*True|allow_origins\s*=\s*\[\s*['\"]\*['\"]"
+     r"|@CrossOrigin(\(\s*(origins\s*=\s*)?\"\*\"\s*\))?\s*$|origins\s*\(?\s*['\"]\*['\"]|AllowAnyOrigin\(\)|AllowAllOrigins\s*:\s*true"
+     r"|AllowedOrigins\s*:\s*\[\]string\{\s*\"\*\"|'allowed_origins'\s*=>\s*\[\s*'\*'", None),
     ("debug-on", "S2", "moyenne", "Mode debug activé (vérifier qu'il est désactivé en production)",
-     r"\bDEBUG\s*=\s*True\b|APP_DEBUG\s*=\s*true|app\.debug\s*=\s*True|display_errors\s*=\s*On", None),
+     r"\bDEBUG\s*=\s*True\b|APP_DEBUG\s*=\s*true|app\.debug\s*=\s*True|display_errors\s*=\s*On|app\.run\([^)]*debug\s*=\s*True"
+     r"|WP_DEBUG['\"]?\s*,\s*true|<compilation[^>]*debug=['\"]true|customErrors\s+mode=['\"]Off|include-stacktrace\s*=\s*always"
+     r"|UseDeveloperExceptionPage\(|ini_set\(\s*['\"]display_errors['\"]\s*,\s*['\"]?(1|On|true)|error_reporting\(\s*E_ALL\s*\)", None),
     ("unsafe-deserialize", "S8", "haute", "Désérialisation non sûre",
-     r"pickle\.loads?\(|yaml\.load\((?![^)]*SafeLoader)|\bunserialize\s*\(|Marshal\.load|ObjectInputStream", None),
+     r"pickle\.loads?\(|yaml\.load\((?![^)]*SafeLoader)|\bunserialize\s*\(|Marshal\.load|ObjectInputStream|BinaryFormatter"
+     r"|TypeNameHandling\.(All|Auto|Objects)|jsonpickle\.decode|XMLDecoder|YAML\.load\((?![^)]*safe)", None),
     ("http-link", "S4", "info", "Ressource chargée en http:// (contenu mixte)",
      r"(src|href)\s*=\s*['\"]http://(?!localhost|127\.0\.0\.1)", None),
     ("log-sensitive", "S9", "moyenne", "Journalisation possible de données sensibles (corps de requête, mot de passe, utilisateur complet)",
-     r"(console\.log|logger\.\w+|print|log\.\w+)\([^)]*(req\.body|request\.body|password|passwd|token|card|cvv|\buser\b\s*\))", None),
+     r"(console\.log|logger\.\w+|print|log\.\w+|error_log|var_dump|print_r|System\.out\.print\w*|Console\.Write\w*|fmt\.Print\w*|\bputs|Log\.[dievw]|_logger\.\w+)\(?[^)]*(req\.body|request\.body|password|passwd|token|card|cvv|\buser\b\s*\))", None),
     ("cdn-no-sri", "S3", "info", "Script chargé depuis un CDN sans attribut integrity (SRI)",
      r"<script\b(?![^>]*\bintegrity=)[^>]*src=['\"]https://(cdn\.jsdelivr\.net|unpkg\.com|cdnjs\.cloudflare\.com|code\.jquery\.com|stackpath)", None),
     ("ai-key-client", "S15", "haute", "Appel direct à un fournisseur d'IA depuis le navigateur (clé exposée ?)",
-     r"dangerouslyAllowBrowser\s*:\s*true|api\.openai\.com|api\.anthropic\.com", None),
+     r"dangerouslyAllowBrowser\s*:\s*true|api\.openai\.com|api\.anthropic\.com|api\.mistral\.ai|generativelanguage\.googleapis\.com", None),
     ("mass-assign", "S14", "moyenne", "Assignation de masse depuis le corps de la requête (risque d'élévation de privilèges)",
-     r"\.(update|create|updateMany|findOneAndUpdate|save|fill)\(\s*\{?\s*\.\.\.\s*(req|request)\.body|\.(update|create)\(\s*(req|request)\.body\s*\)|\{\s*data\s*:\s*(req|request)\.body\s*\}", None),
+     r"\.(update|create|updateMany|findOneAndUpdate|save|fill)\(\s*\{?\s*\.\.\.\s*(req|request)\.body|\.(update|create)\(\s*(req|request)\.body\s*\)|\{\s*data\s*:\s*(req|request)\.body\s*\}"
+     r"|params\.permit!|\$guarded\s*=\s*\[\s*\]|(::|->)(create|update|fill|forceFill)\(\s*\$request->all\(\)|fields\s*=\s*['\"]__all__['\"]", None),
 ]
 
 # Règles sur des balises pouvant s'étendre sur plusieurs lignes (JSX, Vue) :
@@ -139,11 +163,23 @@ RISKY_LICENSES = re.compile(r"\b(A?GPL|LGPL|SSPL|BUSL|CC-BY-NC|UNLICENSED|Commer
 
 # --- Commentaires : remplacés par des espaces (numéros de ligne conservés) pour éviter les faux positifs
 _C_LIKE = {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".css", ".scss", ".sass", ".less", ".vue", ".svelte",
-           ".astro", ".java", ".kt", ".swift", ".dart", ".go", ".php", ".cs", ".c", ".cpp", ".rs"}
-_HTML_LIKE = {".html", ".htm", ".vue", ".svelte", ".astro", ".php", ".twig", ".hbs", ".ejs", ".njk", ".liquid", ".blade.php"}
+           ".astro", ".java", ".kt", ".kts", ".gradle", ".swift", ".dart", ".go", ".php", ".phtml", ".cs", ".c", ".cpp",
+           ".rs", ".scala", ".m", ".mm"}
+_HTML_LIKE = {".html", ".htm", ".vue", ".svelte", ".astro", ".php", ".phtml", ".twig", ".hbs", ".handlebars", ".ejs",
+              ".njk", ".liquid", ".blade.php", ".cshtml", ".razor", ".aspx", ".ascx", ".master", ".jsp", ".jspx", ".tag",
+              ".ftl", ".vm", ".jinja", ".jinja2", ".j2", ".tpl", ".mustache", ".eex", ".heex", ".leex", ".latte",
+              ".gohtml", ".tmpl", ".erb", ".marko", ".xml", ".xib", ".storyboard", ".config", ".cfm"}
+# Langages à commentaires « # » (seules les lignes qui commencent par # : pas de risque sur les couleurs CSS)
+_HASH_LIKE = {".py", ".rb", ".ex", ".exs", ".yml", ".yaml", ".toml", ".sh", ".pl", ".properties", ".ini", ".r"}
 _BLOCK = re.compile(r"/\*.*?\*/", re.S)
 _LINE = re.compile(r"(?<![:\"'`\w(=/\\])//[^\n]*")
 _HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+_HASH_LINE = re.compile(r"^[ \t]*#(?![!{])[^\n]*", re.M)
+# Commentaires de gabarits : Twig/Jinja/Nunjucks {# #}, Blade {{-- --}}, Razor @* *@, ERB/EEx <%# %>,
+# JSP/ASPX <%-- --%>, Handlebars {{!-- --}}, Smarty/Latte {* *}, FreeMarker <#-- -->, Go {{/* */}}
+_TPL_COMMENT = re.compile(r"\{#.*?#\}|\{\{--.*?--\}\}|@\*.*?\*@|<%#.*?%>|<%--.*?--%>|\{\{!--.*?--\}\}|\{\{![^}]*\}\}"
+                          r"|\{\*.*?\*\}|<#--.*?-->|\{\{/\*.*?\*/\}\}", re.S)
+_NO_TPL_COMMENT = {".svelte", ".vue", ".astro", ".xml", ".xib", ".storyboard", ".config"}
 
 
 def _blank(m):
@@ -154,9 +190,13 @@ def strip_comments(text, ext):
     """Neutralise les commentaires sans changer les numéros de ligne."""
     if ext in _HTML_LIKE:
         text = _HTML_COMMENT.sub(_blank, text)
+        if ext not in _NO_TPL_COMMENT:
+            text = _TPL_COMMENT.sub(_blank, text)
     if ext in _C_LIKE:
         text = _BLOCK.sub(_blank, text)
         text = _LINE.sub(_blank, text)
+    if ext in _HASH_LIKE:
+        text = _HASH_LINE.sub(_blank, text)
     return text
 
 # Rapports et documentation du dépôt : jamais des pages du site (sinon le rapport précédent
@@ -188,6 +228,31 @@ def git_tracked(root, rel):
         return out.returncode == 0
     except Exception:
         return False
+
+
+def composer_licenses(root):
+    """Licences des paquets PHP (composer.json + vendor/)."""
+    path = os.path.join(root, "composer.json")
+    vendor = os.path.join(root, "vendor")
+    if not (os.path.isfile(path) and os.path.isdir(vendor)):
+        return [], False
+    try:
+        deps = [d for d in (json.load(open(path, encoding="utf-8")).get("require") or {}) if "/" in d]
+    except Exception:
+        return [], False
+    out = []
+    for dep in deps:
+        p = os.path.join(vendor, dep, "composer.json")
+        if not os.path.isfile(p):
+            continue
+        try:
+            lic = json.load(open(p, encoding="utf-8")).get("license")
+        except Exception:
+            continue
+        lic = ", ".join(lic) if isinstance(lic, list) else lic
+        if not lic or RISKY_LICENSES.search(str(lic)):
+            out.append({"paquet": dep, "licence": lic or "aucune déclarée"})
+    return out, True
 
 
 def dependency_licenses(root):
@@ -298,7 +363,8 @@ def audit(root, max_per_rule):
                         f["occurrences"].append({"fichier": rel, "ligne": i, "extrait": original_lines[i - 1].strip()[:160]})
 
         # E-mails marketing sans lien de désinscription
-        if EMAIL_HINT.search(rel) and ext in {".html", ".htm", ".tsx", ".jsx", ".mjml", ".hbs", ".njk", ".ejs", ".liquid", ".twig", ".vue"}:
+        if EMAIL_HINT.search(rel) and ext in {".html", ".htm", ".tsx", ".jsx", ".mjml", ".hbs", ".handlebars", ".njk", ".ejs", ".liquid", ".twig", ".vue",
+                                         ".erb", ".cshtml", ".razor", ".jinja", ".jinja2", ".j2", ".mustache", ".eex", ".heex", ".ftl", ".jsp"}:
             if MARKETING_HINT.search(content) and not UNSUB.search(content):
                 email_templates_no_unsub.append(rel)
 
@@ -309,6 +375,8 @@ def audit(root, max_per_rule):
 
     secrets_in_git = [e for e in env_files if git_tracked(root, e)]
     deps, deps_checked = dependency_licenses(root)
+    php_deps, php_checked = composer_licenses(root)
+    deps, deps_checked = deps + php_deps, deps_checked or php_checked
 
     extra = []
     if secrets_in_git:
@@ -375,7 +443,8 @@ def render(r):
             out.append(f"- … {total - len(it['occurrences'])} autre(s)")
         out.append("")
     if not r["dependances_licences_verifiees"]:
-        out.append("_Licences des dépendances non vérifiées (pas de package.json ou de node_modules)._")
+        out.append("_Licences des dépendances non vérifiées par ce script (il lit npm et Composer installés). Autres stacks : "
+                   "pip-licenses (Python), license_finder (Ruby, Java, Go, .NET…), cargo-license (Rust)._")
     out.append("_Détection par motifs : chaque constat est à confirmer en lisant le code. Compléter par les tests en navigateur (browser_probe.js) et HTTP (check_headers.py)._")
     return "\n".join(out)
 

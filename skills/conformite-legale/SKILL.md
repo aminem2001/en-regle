@@ -15,7 +15,7 @@ Objectif : qu'un site ou une appli puisse être mis en ligne **sans exposer son 
 - **Ne jamais inventer d'informations d'identité** (SIRET, adresse, capital, hébergeur, médiateur, directeur de publication). Laisser un marqueur `[À COMPLÉTER : …]`. Un faux SIRET dans des mentions légales engage l'éditeur.
 - **Le droit appliqué par défaut est français et européen.** Les règles d'autres pays s'ajoutent seulement si le projet vise ces pays.
 - **Tester uniquement le projet de l'utilisateur** : en local de préférence. Aucun test de sécurité actif sur un site en production ou sur un service tiers sans son accord explicite.
-- **Tu n'es pas avocat.** Dis-le une fois dans le rapport et indique précisément quand un juriste est nécessaire (activité réglementée, données de santé, mineurs, grosses volumétries, litige en cours). Ne noie pas chaque paragraphe d'avertissements.
+- **Tu n'es pas avocat.** Dis-le une fois dans le rapport, en précisant que le rapport n'est pas un conseil juridique, ne garantit pas la conformité et que l'éditeur reste seul responsable de son site, et indique précisément quand un juriste est nécessaire (activité réglementée, données de santé, mineurs, grosses volumétries, litige en cours). Ne noie pas chaque paragraphe d'avertissements.
 - **Ne pas affirmer qu'un point est conforme sans l'avoir vérifié.** Si un test n'a pas pu être fait (pas de navigateur, site qui ne démarre pas), le statut est ❓ avec la raison.
 
 ## Étape 1 — Cadrer (lire avant de demander)
@@ -34,6 +34,8 @@ Explore le projet : manifestes (`package.json`, `composer.json`, `pubspec.yaml`,
 Si l'utilisateur ne sait pas, prends l'hypothèse la plus protectrice et note-la.
 
 ## Étape 2 — Analyser le code
+
+**Toutes les stacks** : les scripts lisent JS/TS, PHP (Twig, Blade, Latte), Python (Jinja, Django), Ruby (ERB, Slim, Haml), Java/Kotlin (JSP, Thymeleaf, FreeMarker), C# (Razor, Blazor), Go, Elixir, Rust, Swift, Dart et HTML. **Sans accès au code** (Shopify, Wix, Squarespace, Webflow, site d'un prestataire) : saute les analyses statiques, fais toute l'étape 3 sur l'URL en ligne (`live_check.mjs`, `check_headers.py`) et lis le texte de chaque page dans le navigateur à la place de `extract_texts.py` ; note dans le rapport que le code n'a pas été audité. Pour WordPress, audite aussi la liste des extensions actives (traceurs et bandeaux sont souvent des extensions).
 
 Lance les deux analyses statiques (Python 3.8+, aucune dépendance) :
 

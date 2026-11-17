@@ -40,7 +40,9 @@ Et Claude déroule tout le cycle, sur **ton** projet, dans **ta** stack :
  ✅ Reteste et prouve que c'est corrigé
 ```
 
-Next.js, Nuxt, React, Vue, Svelte, Astro, Laravel, Django, Rails, WordPress, Shopify, HTML pur, appli iOS ou Android : il s'adapte.
+**Tous les langages, tous les CMS.** JavaScript/TypeScript (Next.js, Nuxt, React, Vue, Svelte, Astro, Angular), PHP (Laravel, Symfony, WordPress, Twig, Blade), Python (Django, Flask, Jinja), Ruby (Rails, ERB, Slim, Haml), Java/Kotlin (Spring, JSP, Thymeleaf, FreeMarker), C# (ASP.NET, Razor, Blazor), Go, Elixir (Phoenix), Rust, HTML pur, appli iOS, Android ou Flutter.
+
+**Pas d'accès au code ?** (Shopify, Wix, Squarespace, Webflow, site d'un prestataire) : il teste le site en ligne directement dans le navigateur (traceurs, cookies, en-têtes, accessibilité, textes des pages).
 
 ## 🎬 Ce qu'il trouve (vrai test)
 
@@ -165,9 +167,17 @@ Plus **8 modèles de pages** (mentions légales, confidentialité, cookies, CGV,
 - **Il ne teste que ton projet**, en local de préférence.
 - **Il revérifie le droit récent en ligne** à chaque audit (`veille.md`), parce que les règles changent plusieurs fois par an.
 
-## ⚠️ À savoir
+## ⚠️ Avertissement — limitation de responsabilité
 
-En règle te fait gagner du temps et repère les problèmes les plus courants et les plus sanctionnés. Ses outils fonctionnent par détection de motifs et par tests : ils peuvent rater un cas particulier, et c'est pourquoi Claude relit chaque alerte. Enfin, ce **n'est pas un avocat**. Pour une activité réglementée, des données de santé, des mineurs ou un litige, fais valider par un professionnel.
+**À lire avant d'utiliser En règle.**
+
+- **Nous ne sommes ni avocats, ni juristes, ni experts en droit.** En règle est un outil d'aide qui cherche à **réduire au maximum les risques** les plus courants. Ce n'est **pas un conseil juridique** et il ne remplace pas un professionnel du droit.
+- **Aucune garantie de conformité.** Un audit En règle ne certifie pas qu'un site ou une appli est conforme à la loi. Les outils fonctionnent par détection de motifs et par tests automatiques : ils peuvent se tromper, rater un cas ou signaler à tort. Le droit change souvent et son interprétation dépend de chaque situation.
+- **Tu restes seul responsable** de ton site, de ton appli, de tes contenus, de tes documents légaux et de ce que tu mets en ligne. C'est à toi de vérifier, de valider et d'appliquer (ou non) les résultats et les corrections proposés.
+- **Aucune responsabilité de notre part.** Les auteurs et contributeurs d'En règle ne peuvent pas être tenus responsables d'une sanction, d'une amende, d'un litige, d'une perte de données, d'un préjudice ou de tout autre problème lié, directement ou indirectement, à l'utilisation de cet outil, de ses rapports ou de ses corrections. Le logiciel est fourni « tel quel », sans garantie d'aucune sorte (voir la [licence MIT](LICENSE)).
+- **Fais valider par un professionnel** (avocat, juriste, DPO) avant toute mise en ligne importante, et toujours en cas d'activité réglementée, de données de santé, de mineurs, de gros volumes de données ou de litige.
+
+En utilisant En règle, tu acceptes ces conditions.
 
 ## 🤝 Contribuer
 

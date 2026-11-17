@@ -23,29 +23,36 @@ SKIP_DIRS = {
     "node_modules", ".git", ".next", ".nuxt", ".svelte-kit", ".output", "dist",
     "build", "out", "coverage", ".cache", ".turbo", ".vercel", ".netlify",
     "vendor", "Pods", ".gradle", "DerivedData", "__pycache__", ".venv", "venv",
-    ".idea", ".vscode", "public/build", "storybook-static",
+    ".idea", ".vscode", "public/build", "storybook-static", "target", "bin", "obj", "_build", "deps",
+    "wp-admin", "wp-includes", "storage", "tmp", "bower_components",
 }
 TEXT_EXT = {
     ".html", ".htm", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".vue",
     ".svelte", ".astro", ".php", ".twig", ".liquid", ".erb", ".hbs", ".njk",
     ".ejs", ".pug", ".md", ".mdx", ".json", ".py", ".rb", ".go", ".css",
     ".scss", ".swift", ".kt", ".java", ".dart", ".xml", ".plist", ".gradle",
-    ".kts", ".yml", ".yaml", ".toml", ".env.example", ".txt",
+    ".kts", ".yml", ".yaml", ".toml", ".env.example", ".txt", ".csproj",
+    ".cshtml", ".razor", ".cs", ".vb", ".aspx", ".ascx", ".master", ".jsp", ".jspx", ".tag", ".ftl", ".vm",
+    ".jinja", ".jinja2", ".j2", ".tpl", ".mustache", ".handlebars", ".eex", ".heex", ".leex", ".ex", ".exs",
+    ".slim", ".haml", ".latte", ".phtml", ".gohtml", ".tmpl", ".rs", ".scala", ".marko", ".m", ".mm",
+    ".storyboard", ".xib", ".kts", ".gradle", ".config", ".properties", ".ini", ".cfm", ".pl", ".lua",
 }
-SPECIAL_FILES = {"Podfile", "Gemfile", "pubspec.yaml", "composer.json", "package.json"}
+SPECIAL_FILES = {"Podfile", "Gemfile", "pubspec.yaml", "composer.json", "package.json", "Pipfile", "go.mod",
+                 "Cargo.toml", "pom.xml", "build.gradle", "packages.config", "mix.exs", "Dockerfile"}
 MAX_BYTES = 2_000_000
 
 # (identifiant, libellé, catégorie, consentement, regex)
 # consentement : "oui", "non", "selon config", "à évaluer"
 SERVICES = [
     ("ga", "Google Analytics / gtag", "Mesure d'audience", "oui",
-     r"googletagmanager\.com/gtag|google-analytics\.com|gtag\(\s*['\"]config|\bG-[A-Z0-9]{6,}\b|@next/third-parties/google|react-ga4?|vue-gtag"),
+     r"googletagmanager\.com/gtag|google-analytics\.com|gtag\(\s*['\"]config|\bG-[A-Z0-9]{6,}\b|@next/third-parties/google|react-ga4?|vue-gtag"
+     r"|google-site-kit|monsterinsights|ga-google-analytics|analytify|django-google-analytics|laravel-analytics"),
     ("gtm", "Google Tag Manager", "Gestionnaire de balises", "selon config",
      r"googletagmanager\.com/gtm\.js|\bGTM-[A-Z0-9]{4,}\b|react-gtm-module"),
     ("gads", "Google Ads / DoubleClick", "Publicité", "oui",
      r"googleadservices\.com|doubleclick\.net|googlesyndication\.com|\bAW-\d{6,}"),
     ("meta", "Meta (Facebook) Pixel / SDK", "Publicité", "oui",
-     r"connect\.facebook\.net|fbq\(|facebook-pixel|react-facebook-pixel|FBSDK|com\.facebook\.android"),
+     r"connect\.facebook\.net|fbq\(|facebook-pixel|react-facebook-pixel|FBSDK|com\.facebook\.android|pixelyoursite|facebook-for-woocommerce"),
     ("tiktok", "TikTok Pixel", "Publicité", "oui", r"analytics\.tiktok\.com|ttq\.load|ttq\.track"),
     ("linkedin", "LinkedIn Insight", "Publicité", "oui", r"snap\.licdn\.com|_linkedin_partner_id"),
     ("pinterest", "Pinterest Tag", "Publicité", "oui", r"s\.pinimg\.com/ct|pintrk\("),
@@ -95,6 +102,12 @@ SERVICES = [
      r"appsflyer|com\.adjust\.sdk|adjust-sdk|react-native-adjust|branch\.io|react-native-branch|admob|google-mobile-ads|onesignal"),
     ("mailchimp", "Mailchimp / Brevo / Mailerlite / ConvertKit (newsletter)", "Prospection e-mail", "consentement à la collecte",
      r"mailchimp|list-manage\.com|sendinblue|brevo|mailerlite|convertkit|kit\.com"),
+    ("shopify-analytics", "Shopify (statistiques et pixels clients)", "Mesure d'audience / publicité", "selon config (API Customer Privacy)",
+     r"Shopify\.analytics|cdn\.shopify\.com/s/trekkie|monorail-edge\.shopifysvc|web-pixels-manager|customerPrivacy"),
+    ("woo-attribution", "WooCommerce (attribution des commandes, sourcebuster)", "Mesure d'audience", "oui en général",
+     r"wc-order-attribution|sourcebuster|sbjs_"),
+    ("wix-squarespace", "Wix / Squarespace / Webflow (statistiques intégrées)", "Mesure d'audience", "selon config de la plateforme",
+     r"static\.parastorage\.com|frog\.wix\.com|static1\.squarespace\.com|assets\.squarespace\.com|webflow\.com/.*\.js"),
     ("ai", "Fournisseur d'IA (OpenAI, Anthropic, Mistral, Google, Vercel AI SDK…)", "Intelligence artificielle", "AI Act art. 50 + RGPD",
      # Vraies intégrations seulement (import, dépendance, API) — pas un nom cité dans un texte
      r"@anthropic-ai/|anthropic\.com/v1|api\.openai\.com|api\.mistral\.ai|@google/generative-ai|@google/genai|@ai-sdk/|@langchain/"
@@ -113,6 +126,10 @@ CMP = [
     ("Iubenda", r"iubenda"),
     ("Usercentrics", r"usercentrics"),
     ("Sirdata / CookieYes / Complianz / Termly", r"sirdata|cookieyes|complianz|termly"),
+    ("Extension WordPress (Cookie Notice, CookieYes, GDPR Cookie Compliance, Real Cookie Banner, Borlabs, Moove)",
+     r"cookie-notice|cookie-law-info|gdpr-cookie-compliance|real-cookie-banner|borlabs-cookie|moove_gdpr|gdpr-cookie-consent"),
+    ("Paquet de consentement (django-cookie-consent, laravel-cookie-consent, cookie_consent Rails…)",
+     r"django[-_]cookie[-_]consent|laravel-cookie-consent|cookie[-_]consent[-_]?(rails|gem)|ConsentManager"),
     ("Google Consent Mode", r"gtag\(\s*['\"]consent['\"]|consent_mode|ad_storage|analytics_storage"),
     ("App Tracking Transparency (iOS)", r"ATTrackingManager|requestTrackingAuthorization|NSUserTrackingUsageDescription"),
 ]
@@ -151,11 +168,23 @@ CHECKS = [
 
 # --- Commentaires : remplacés par des espaces (numéros de ligne conservés) pour éviter les faux positifs
 _C_LIKE = {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".css", ".scss", ".sass", ".less", ".vue", ".svelte",
-           ".astro", ".java", ".kt", ".swift", ".dart", ".go", ".php", ".cs", ".c", ".cpp", ".rs"}
-_HTML_LIKE = {".html", ".htm", ".vue", ".svelte", ".astro", ".php", ".twig", ".hbs", ".ejs", ".njk", ".liquid", ".blade.php"}
+           ".astro", ".java", ".kt", ".kts", ".gradle", ".swift", ".dart", ".go", ".php", ".phtml", ".cs", ".c", ".cpp",
+           ".rs", ".scala", ".m", ".mm"}
+_HTML_LIKE = {".html", ".htm", ".vue", ".svelte", ".astro", ".php", ".phtml", ".twig", ".hbs", ".handlebars", ".ejs",
+              ".njk", ".liquid", ".blade.php", ".cshtml", ".razor", ".aspx", ".ascx", ".master", ".jsp", ".jspx", ".tag",
+              ".ftl", ".vm", ".jinja", ".jinja2", ".j2", ".tpl", ".mustache", ".eex", ".heex", ".leex", ".latte",
+              ".gohtml", ".tmpl", ".erb", ".marko", ".xml", ".xib", ".storyboard", ".config", ".cfm"}
+# Langages à commentaires « # » (seules les lignes qui commencent par # : pas de risque sur les couleurs CSS)
+_HASH_LIKE = {".py", ".rb", ".ex", ".exs", ".yml", ".yaml", ".toml", ".sh", ".pl", ".properties", ".ini", ".r"}
 _BLOCK = re.compile(r"/\*.*?\*/", re.S)
 _LINE = re.compile(r"(?<![:\"'`\w(=/\\])//[^\n]*")
 _HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+_HASH_LINE = re.compile(r"^[ \t]*#(?![!{])[^\n]*", re.M)
+# Commentaires de gabarits : Twig/Jinja/Nunjucks {# #}, Blade {{-- --}}, Razor @* *@, ERB/EEx <%# %>,
+# JSP/ASPX <%-- --%>, Handlebars {{!-- --}}, Smarty/Latte {* *}, FreeMarker <#-- -->, Go {{/* */}}
+_TPL_COMMENT = re.compile(r"\{#.*?#\}|\{\{--.*?--\}\}|@\*.*?\*@|<%#.*?%>|<%--.*?--%>|\{\{!--.*?--\}\}|\{\{![^}]*\}\}"
+                          r"|\{\*.*?\*\}|<#--.*?-->|\{\{/\*.*?\*/\}\}", re.S)
+_NO_TPL_COMMENT = {".svelte", ".vue", ".astro", ".xml", ".xib", ".storyboard", ".config"}
 
 
 def _blank(m):
@@ -166,9 +195,13 @@ def strip_comments(text, ext):
     """Neutralise les commentaires sans changer les numéros de ligne."""
     if ext in _HTML_LIKE:
         text = _HTML_COMMENT.sub(_blank, text)
+        if ext not in _NO_TPL_COMMENT:
+            text = _TPL_COMMENT.sub(_blank, text)
     if ext in _C_LIKE:
         text = _BLOCK.sub(_blank, text)
         text = _LINE.sub(_blank, text)
+    if ext in _HASH_LIKE:
+        text = _HASH_LINE.sub(_blank, text)
     return text
 
 # Rapports et documentation du dépôt : jamais des pages du site (sinon le rapport précédent
