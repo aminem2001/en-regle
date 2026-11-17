@@ -79,7 +79,7 @@ Durées de conservation courantes (référentiels CNIL, à adapter) :
 
 ## 5. Cookies et traceurs
 
-**Base** : article 82 de la loi Informatique et Libertés (transposition de la directive ePrivacy), lignes directrices et recommandation de la CNIL (2020, modifiées en 2026 ; voir `veille.md`).
+**Base** : article 82 de la loi Informatique et Libertés (transposition de la directive ePrivacy), lignes directrices et recommandation de la CNIL (2020, avec la FAQ de la CNIL ; recommandation spécifique aux pixels des e-mails d'avril 2026).
 Concerne tous les traceurs : cookies, localStorage, pixels, fingerprinting, SDK dans les applis mobiles.
 
 ### Règles du bandeau
@@ -131,10 +131,12 @@ Ils doivent tout de même être mentionnés dans la politique cookies :
 | Canal | Particuliers (B2C) | Professionnels (B2B) |
 |---|---|---|
 | E-mail, SMS, MMS | **Consentement préalable** (case non pré-cochée), sauf client existant pour des produits ou services analogues, avec possibilité de s'opposer dès la collecte | Information + droit d'opposition, si le message est en rapport avec la profession |
-| Téléphone | Régime en évolution : passage à l'**opt-in** (voir `veille.md`) ; à défaut, respect de Bloctel | Opposition |
+| Téléphone | **Consentement préalable** (opt-in) depuis le **11 août 2026** (loi n° 2025-594 du 30 juin 2025, art. L223-1 C. conso réécrit) : libre, spécifique, éclairé, univoque, révocable, prouvé ; sauf contrat en cours. Bloctel ne suffit plus | Régime d'opposition (vérifier l'application aux pros) |
 | Courrier postal | Opposition | Opposition |
 
 Chaque message : identité de l'expéditeur, **lien de désinscription** simple et gratuit, objet non trompeur.
+
+**Pixels de suivi dans les e-mails** (recommandation CNIL publiée le 14 avril 2026) : ce sont des traceurs au sens de l'article 82. Le **consentement** est requis notamment pour un usage publicitaire ou commercial (taux d'ouverture marketing, profilage), recueilli de préférence lors de la collecte de l'adresse ; deux exceptions limitées (voir la FAQ CNIL). Fin de la période de transition pour les adresses déjà collectées : **14 juillet 2026**. À vérifier dans l'outil d'e-mailing (Brevo, Mailchimp…) : désactiver le suivi des ouvertures sans consentement.
 
 ---
 

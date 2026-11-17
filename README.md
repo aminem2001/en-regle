@@ -167,6 +167,10 @@ Plus **8 modèles de pages** (mentions légales, confidentialité, cookies, CGV,
 - **Il ne teste que ton projet**, en local de préférence.
 - **Il revérifie le droit récent en ligne** à chaque audit (`veille.md`), parce que les règles changent plusieurs fois par an.
 
+## 📚 Sources du contenu juridique
+
+Les règles du skill ont été revérifiées le **18 novembre 2026** sur les textes officiels (Légifrance, EUR-Lex, CNIL) et, à défaut, sur plusieurs sources spécialisées concordantes. Le fichier `references/veille.md` indique pour chaque point récent sa date de vérification, son niveau de fiabilité et où le revérifier. Une erreur ? Ouvre une issue avec la source officielle.
+
 ## ⚠️ Avertissement — limitation de responsabilité
 
 **À lire avant d'utiliser En règle.**

@@ -142,7 +142,7 @@ LEGAL_PAGES = [
     ("CGU", r"\bcgu\b|conditions[-_ ]?g[ée]n[ée]rales[-_ ]?d['’]?utilisation|terms[-_ ]?of[-_ ]?(use|service)"),
     ("Déclaration d'accessibilité", r"d[ée]claration[-_ ]?d['’]?accessibilit[ée]|accessibility[-_ ]?statement|/accessibilit[ée]"),
     ("Résiliation en ligne", r"r[ée]silier[-_ ]?(votre|mon|le)[-_ ]?(contrat|abonnement)|cancel[-_ ]?subscription"),
-    ("Fonction de rétractation", r"se[-_ ]?r[ée]tracter|r[ée]tractation|withdraw(al)?[-_ ]?(from|button|function)"),
+    ("Fonction de rétractation", r"renoncer[-_ ]?au[-_ ]?contrat|se[-_ ]?r[ée]tracter|r[ée]tractation|withdraw(al)?[-_ ]?(from|button|function)"),
     ("Médiateur de la consommation", r"m[ée]diat(eur|ion)[-_ ]?de[-_ ]?la[-_ ]?consommation|m[ée]diateur"),
     ("Suppression de compte", r"supprimer[-_ ]?(mon|votre|le)[-_ ]?compte|delete[-_ ]?(my[-_ ]?|your[-_ ]?)?account"),
     ("Do Not Sell or Share (Californie)", r"do[-_ ]?not[-_ ]?sell"),

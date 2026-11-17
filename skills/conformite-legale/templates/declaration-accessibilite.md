@@ -4,7 +4,7 @@
 
 _Établie le [date] · Mise à jour le [date]_
 
-[Éditeur] s'engage à rendre [site / application] accessible conformément à [l'article 47 de la loi n° 2005-102 du 11 février 2005 / aux articles L412-13 et suivants du Code de la consommation (European Accessibility Act)].
+[Éditeur] s'engage à rendre [site / application] accessible conformément à [l'article 47 de la loi n° 2005-102 du 11 février 2005 / à la loi n° 2023-171 du 9 mars 2023 et au décret n° 2023-931 et suivants du Code de la consommation (European Accessibility Act)].
 
 Cette déclaration s'applique à [URL ou nom de l'application].
 

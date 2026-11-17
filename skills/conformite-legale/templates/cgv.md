@@ -39,10 +39,10 @@ Zones desservies : [zones]. Délais : [délais]. À défaut de délai indiqué, 
 Le Client dispose d'un délai de **14 jours** à compter de la réception du bien [de la conclusion du contrat pour un service] pour se rétracter, sans avoir à se justifier.
 
 **Comment se rétracter :**
-- en ligne, via la fonction **« Se rétracter du contrat ici »** accessible [depuis l'e-mail de confirmation et l'espace client / à l'adresse …] ;
+- en ligne, via la fonction **« Renoncer au contrat ici »** accessible [depuis l'e-mail de confirmation et l'espace client / à l'adresse …] ;
 - ou en envoyant le formulaire ci-dessous, ou toute déclaration dénuée d'ambiguïté, à [adresse e-mail et postale].
 
-Un accusé de réception est envoyé sans délai par e-mail.
+Après la confirmation (« Confirmer la rétractation »), un accusé de réception mentionnant le contenu de la rétractation, sa date et son heure est envoyé par e-mail dans un délai raisonnable.
 
 Le Client renvoie le bien au plus tard 14 jours après sa rétractation, à [adresse]. Les frais de retour sont à la charge [du Client / du Vendeur]. Le Vendeur rembourse toutes les sommes versées, y compris les frais de livraison standard, au plus tard 14 jours après avoir été informé de la rétractation ; il peut différer le remboursement jusqu'à la récupération du bien ou la preuve de son expédition.
 

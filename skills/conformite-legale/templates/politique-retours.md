@@ -9,7 +9,7 @@ _Dernière mise à jour : [date]_
 Vous pouvez changer d'avis et nous retourner votre commande **dans les 14 jours** suivant sa réception, sans avoir à vous justifier.
 
 **Pour vous rétracter :**
-1. Cliquez sur **« Se rétracter du contrat ici »** [dans votre espace client / dans l'e-mail de confirmation / ici : lien], ou envoyez-nous le formulaire de rétractation (dans nos [CGV](/cgv)) ou un simple message à [e-mail].
+1. Cliquez sur **« Renoncer au contrat ici »** [dans votre espace client / dans l'e-mail de confirmation / ici : lien], ou envoyez-nous le formulaire de rétractation (dans nos [CGV](/cgv)) ou un simple message à [e-mail].
 2. Vous recevez immédiatement un accusé de réception par e-mail.
 3. Renvoyez le produit au plus tard 14 jours après, à : [adresse de retour].
 

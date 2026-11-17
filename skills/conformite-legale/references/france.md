@@ -12,11 +12,11 @@
 
 ## 1. Mentions légales (LCEN)
 
-**Base** : loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), obligations d'identification de l'éditeur (historiquement art. 6-III ; la loi SREN de 2024 a renuméroté une partie de la LCEN, cite « la LCEN » sans numéro d'article si tu n'as pas pu vérifier).
+**Base** : loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), **article 1-1** (obligations d'identification de l'éditeur) et **article 1-2** (sanctions), dans leur rédaction issue de la loi n° 2024-449 du 21 mai 2024 (SREN). Ces obligations figuraient auparavant à l'article 6-III ; ne cite plus « article 6-III ».
 
 **Qui** : tout éditeur d'un service de communication au public en ligne, professionnel ou non.
 
-**Sanction** : jusqu'à 1 an d'emprisonnement et 75 000 € d'amende pour une personne physique, et le quintuple (375 000 €) pour une personne morale. Peu poursuivi seul, mais souvent relevé lors d'un contrôle DGCCRF ou d'un litige.
+**Sanction** (art. 1-2 LCEN) : jusqu'à 1 an d'emprisonnement et 75 000 € d'amende pour une personne physique, et le quintuple (375 000 €) pour une personne morale. Peu poursuivi seul, mais souvent relevé lors d'un contrôle DGCCRF ou d'un litige.
 
 **Où** : une page dédiée, accessible depuis toutes les pages (pied de page), intitulée « Mentions légales ».
 
@@ -75,17 +75,17 @@ Les offres, CGV, modes d'emploi, garanties et la présentation des biens et serv
 - **Déclaration d'accessibilité** (résultat de l'audit, contenus non accessibles, dérogations, moyen de contact, voie de recours vers le Défenseur des droits)
 - **Schéma pluriannuel** de mise en accessibilité (3 ans) et plan d'action annuel
 
-**Sanctions** : amende administrative (jusqu'à 50 000 € par service selon la loi de 2023 ; un décret d'août 2026 a modifié le décret de 2019, voir `veille.md`).
+**Contrôle et sanctions** : l'**Arcom** contrôle (ordonnance n° 2023-859). Sanctions prévues par la loi (art. 47) : jusqu'à **50 000 €** pour le défaut d'accessibilité et **25 000 €** pour les obligations de publication (mention, déclaration, schéma). Le **décret n° 2026-816 du 24 août 2026** (JO du 26/08/2026, en vigueur le 27/08/2026) a modifié le décret n° 2019-768 : référence aux normes harmonisées, chapitre « Sanctions et suivi » devenu « Suivi », article 8 abrogé. Les sanctions restent celles de la loi. Le RGAA 4.1.2 reste la référence (RGAA 5 en préparation).
 
 ---
 
 ## 6. Accessibilité : European Accessibility Act (EAA)
 
-**Base** : directive (UE) 2019/882, transposée par la loi n° 2023-171 (DDADUE) et le décret n° 2023-931 du 9 octobre 2023 (articles L412-13 et suivants du Code de la consommation). En vigueur depuis le **28 juin 2025**.
+**Base** : directive (UE) 2019/882, transposée par la loi n° 2023-171 du 9 mars 2023 (art. 16), l'ordonnance n° 2023-859 du 6 septembre 2023 et le décret n° 2023-931 du 9 octobre 2023. En vigueur depuis le **28 juin 2025**.
 
 **Qui** : les entreprises qui fournissent aux consommateurs certains services, dont le **commerce électronique** (tout site ou appli permettant de conclure un contrat de vente avec un particulier), les services bancaires, de communications électroniques, de transport de voyageurs, les livres numériques et l'audiovisuel.
 
-**Exemption** : la directive exempte les **microentreprises qui fournissent des services** (moins de 10 salariés et chiffre d'affaires annuel ou total de bilan ≤ 2 M€). Sa portée exacte en droit français est à confirmer (voir `veille.md`). En cas de doute, vise la conformité : c'est aussi un argument commercial et une protection face aux réclamations.
+**Exemption** : les **microentreprises qui fournissent des services** (moins de 10 salariés et chiffre d'affaires annuel ou total de bilan ≤ 2 M€) ne sont pas concernées (directive art. 4.5 ; reprise en droit français). Celles qui fabriquent ou distribuent des **produits** couverts restent concernées. En cas de doute, vise la conformité : c'est aussi un argument commercial et une protection face aux réclamations.
 Exemption aussi possible pour « charge disproportionnée », à documenter et justifier ; elle ne se présume pas.
 
 **Transition** : les services en place avant le 28 juin 2025 peuvent bénéficier d'une période transitoire jusqu'au 28 juin 2030 pour certains contrats et produits ; les nouveaux sites doivent être conformes dès leur lancement.
@@ -95,6 +95,6 @@ Exemption aussi possible pour « charge disproportionnée », à documenter et j
 - Informations sur l'accessibilité du service, dans les CGV ou un document équivalent : description du service, manière dont il répond aux exigences (déclaration d'accessibilité)
 - Informer la DGCCRF et les clients en cas de non-conformité constatée, et corriger
 
-**Contrôle** : DGCCRF (fiches pratiques publiées en 2025 et note sur l'e-commerce en décembre 2025). Montant des sanctions : à vérifier dans le Code de la consommation (voir `veille.md`).
+**Contrôle** : DGCCRF pour le commerce électronique et les produits grand public (ARCEP, ARCOM, ACPR, AMF et Banque de France pour leurs secteurs). **Sanctions** (décret n° 2023-931) : amende des contraventions de 5e classe, soit **1 500 € par manquement** pour une personne physique et **7 500 €** pour une personne morale, cumulables par manquement constaté, doublées en cas de récidive (3 000 € / 15 000 €). Les chiffres de « 50 000 € » ou « 300 000 € » qui circulent concernent le RGAA (Arcom) ou sont erronés.
 
 **À contrôler dans le code** : contrastes, navigation au clavier, focus visible, textes alternatifs, libellés de formulaires, structure des titres, messages d'erreur, langue de la page, compatibilité lecteur d'écran, y compris pour le **bandeau cookies et le tunnel de commande**. Le skill `accessibility` peut approfondir l'audit technique.

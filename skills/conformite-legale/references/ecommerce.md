@@ -52,19 +52,19 @@ Avant la commande, de manière lisible et compréhensible :
 - **Exceptions** (L221-28) : biens personnalisés ou périssables, enregistrements audio, vidéo ou logiciels descellés, contenus numériques fournis sans support matériel dont l'exécution a commencé avec l'accord exprès du consommateur et sa renonciation expresse, prestations de services pleinement exécutées avant la fin du délai avec accord exprès, hébergement, transport, restauration et loisirs à date déterminée, etc. Pour les contenus numériques et services commencés pendant le délai : recueillir l'**accord exprès** et la **reconnaissance de la perte du droit** au moment de la commande (case à cocher).
 
 ### Fonction (bouton) de rétractation en ligne
-**Obligatoire depuis le 19 juin 2026** (directive (UE) 2023/2673, transposée par l'ordonnance n° 2026-2 et le décret n° 2026-3 du 5 janvier 2026 ; article L221-21 C. conso modifié).
-Pour tout contrat conclu via une interface en ligne :
-- une **fonction de rétractation** bien visible et facilement accessible pendant tout le délai de rétractation, libellée clairement (par exemple « Se rétracter du contrat ici ») ;
-- elle permet au consommateur de saisir ou confirmer son nom, les éléments d'identification du contrat et le moyen de recevoir l'accusé de réception ;
-- une étape de confirmation (par exemple « Confirmer la rétractation ») ;
-- un **accusé de réception** envoyé sans délai sur un support durable (e-mail), avec la date et l'heure de la rétractation.
-Revérifie les modalités exactes (voir `veille.md`).
+**Obligatoire depuis le 19 juin 2026** pour tout contrat à distance conclu via une interface en ligne et soumis au droit de rétractation (directive (UE) 2023/2673, considérant 37 ; **article L221-21** C. conso modifié par l'ordonnance n° 2026-2 du 5 janvier 2026 ; **article D221-5** créé par le décret n° 2026-3 du 5 janvier 2026). Vérifié sur Légifrance le 2026-11-18.
+- **Libellé obligatoire** : la fonction est identifiée, de manière lisible, par les mots **« renoncer au contrat ici »** ou une formule analogue dénuée d'ambiguïté (D221-5). Elle est affichée de manière visible, directement et facilement accessible, et disponible **pendant toute la durée du délai de rétractation**. Gratuite.
+- **Ce que le consommateur saisit ou confirme** : a) son nom et son prénom ; b) des indications détaillées permettant d'identifier le contrat ; c) le moyen électronique par lequel il veut recevoir l'accusé de réception.
+- **Étape de confirmation** : identifiée par les mots **« confirmer la rétractation »** ou une formule analogue dénuée d'ambiguïté.
+- **Accusé de réception** : envoyé dans un délai raisonnable sur support papier ou autre support durable (e-mail), mentionnant le contenu de la déclaration de rétractation et **la date et l'heure** de son envoi.
+- **Information précontractuelle** : le formulaire d'information (annexe de l'article R221-3) mentionne la possibilité d'exercer la rétractation en ligne et où.
+- L'absence de la fonction ne prive pas le consommateur de son droit (il peut toujours se rétracter par toute déclaration dénuée d'ambiguïté), mais expose le professionnel à des sanctions.
 
 ---
 
 ## 4. Garanties légales
 
-- **Garantie légale de conformité** (L217-3 et suivants) : 2 ans pour les biens neufs (1 an minimum possible pour l'occasion si convenu), présomption de défaut pendant 24 mois (12 mois pour l'occasion). Pour les contenus et services numériques : L224-25-1 et suivants.
+- **Garantie légale de conformité** (L217-3 et suivants) : **2 ans** à compter de la délivrance, pour les biens neufs comme d'occasion vendus par un professionnel ; le défaut est présumé exister à la délivrance pendant **24 mois** (biens neufs) ou **12 mois** (biens d'occasion) (L217-7, rédaction issue de l'ordonnance du 29 septembre 2021). Pour les contenus et services numériques : L224-25-1 et suivants.
 - **Garantie des vices cachés** (art. 1641 et suivants Code civil) : 2 ans à compter de la découverte du vice.
 - **Encadré obligatoire** : le décret n° 2022-946 impose de reproduire dans les CGV des **mentions types** sur la garantie légale de conformité (texte fixé à l'annexe de l'article D211-2 du C. conso). Reprends le texte officiel, ne le paraphrase pas.
 - **Garantie commerciale** éventuelle : contrat écrit précisant son contenu, sa durée, son prix et rappelant les garanties légales.
