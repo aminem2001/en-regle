@@ -1,6 +1,6 @@
 ---
 name: conformite-legale
-description: Audite, teste et corrige la conformité légale et la sécurité d'un site web, d'un e-commerce, d'un SaaS ou d'une appli mobile — France, Union européenne et monde. Grille de 52 points : 30 points légaux (mentions légales LCEN, RGPD, politique de confidentialité, cookies et bandeau CNIL, CGV/CGU, rétractation et bouton de rétractation, remboursement, médiateur, garanties, résiliation en 3 clics, dark patterns, faux avis, allégations, prospection e-mail, licences, accessibilité RGAA/EAA/WCAG, DSA, AI Act) + 15 points sécurité (OWASP Top 10 2025, en-têtes HTTP, secrets, API, IA) + 7 points hébergement et e-mail (offre gratuite autorisée pour un pro, contrat de données DPA, hébergeur réel, MX, SPF, DKIM, DMARC). Analyse le code, teste le site dans un vrai navigateur (traceurs avant consentement, contrastes, clavier), vérifie l'hébergeur et l'e-mail, rédige un rapport simple par catégorie, puis corrige après validation et retest. Utilise ce skill dès que l'utilisateur veut déployer, lancer ou mettre en ligne un site ou une appli « en règle », « conforme », « sans risque juridique », ou parle de RGPD, GDPR, CNIL, cookies, bandeau cookies, mentions légales, politique de confidentialité, CGV, CGU, RGAA, accessibilité, WCAG, DGCCRF, OWASP, sécurité avant mise en production, audit légal — même s'il ne demande pas explicitement un audit.
+description: Audite, teste et corrige la conformité légale et la sécurité d'un site web, d'un e-commerce, d'un SaaS ou d'une appli mobile — France, Union européenne et monde. Grille de 52 points : 30 points légaux (mentions légales LCEN, RGPD, politique de confidentialité, cookies et bandeau CNIL, CGV/CGU, rétractation et bouton de rétractation, remboursement, médiateur, garanties, résiliation en 3 clics, dark patterns, faux avis, allégations, prospection e-mail, licences, accessibilité RGAA/EAA/WCAG, DSA, AI Act) + 15 points sécurité (OWASP Top 10 2025, en-têtes HTTP, secrets, API, IA) + 7 points hébergement et e-mail (offre gratuite autorisée pour un pro, contrat de données DPA, hébergeur réel, MX, SPF, DKIM, DMARC). Analyse le code, teste le site dans un vrai navigateur (traceurs avant consentement, contrastes, clavier), vérifie l'hébergeur et l'e-mail, analyse les applis mobiles (Flutter, React Native, Expo, Swift, Kotlin : SDK, consentement, ATT, permissions, règles App Store et Google Play), rédige un rapport simple par catégorie, puis corrige après validation et retest. Utilise ce skill dès que l'utilisateur veut déployer, lancer ou mettre en ligne un site ou une appli « en règle », « conforme », « sans risque juridique », ou parle de RGPD, GDPR, CNIL, App Store, Google Play, appli iOS ou Android, cookies, bandeau cookies, mentions légales, politique de confidentialité, CGV, CGU, RGAA, accessibilité, WCAG, DGCCRF, OWASP, sécurité avant mise en production, audit légal — même s'il ne demande pas explicitement un audit.
 ---
 
 # Conformité légale et sécurité des sites et applis
@@ -40,13 +40,17 @@ Si l'utilisateur ne sait pas, prends l'hypothèse la plus protectrice et note-la
 
 **Toutes les stacks** : les scripts lisent JS/TS, PHP (Twig, Blade, Latte), Python (Jinja, Django), Ruby (ERB, Slim, Haml), Java/Kotlin (JSP, Thymeleaf, FreeMarker), C# (Razor, Blazor), Go, Elixir, Rust, Swift, Dart et HTML. **Sans accès au code** (Shopify, Wix, Squarespace, Webflow, site d'un prestataire) : saute les analyses statiques, fais toute l'étape 3 sur l'URL en ligne (`live_check.mjs`, `check_headers.py`) et lis le texte de chaque page dans le navigateur à la place de `extract_texts.py` ; note dans le rapport que le code n'a pas été audité. Pour WordPress, audite aussi la liste des extensions actives (traceurs et bandeaux sont souvent des extensions).
 
-Lance les deux analyses statiques (Python 3.8+, aucune dépendance) :
+Lance les analyses statiques (Python 3.8+, aucune dépendance) :
 
 ```bash
 python3 <skill>/scripts/scan_trackers.py <projet>    # traceurs, bandeau, pages légales, services tiers
 python3 <skill>/scripts/audit_static.py <projet>     # accessibilité, sécurité OWASP, dark patterns, allégations, e-mails, licences,
                                                      # limitation anti-abus en mémoire, alertes qui s'emballent, envoi d'e-mail non vérifié
+python3 <skill>/scripts/audit_mobile.py <projet>     # SI c'est une appli : SDK et consentement, ATT, permissions, manifeste Apple,
+                                                     # suppression du compte, liens légaux, stockage des jetons, API Android, accessibilité
 ```
+
+**Appli mobile** (Flutter, React Native, Expo, Swift, Kotlin, Capacitor, Cordova, .NET MAUI, Kotlin Multiplatform) : lance aussi `audit_mobile.py`, lis `references/mobile.md`, ajoute les 7 points « Appli mobile et stores » (M1 à M7, grille de 59 points) et demande à l'utilisateur ce qu'il a déclaré sur les fiches des stores (« App Privacy », « Sécurité des données », statut de trader) et l'URL de sa politique de confidentialité. Si l'appli a aussi un site ou une API, audite-les comme d'habitude.
 
 Puis audite les dépendances avec l'outil de la stack (`npm audit --omit=dev`, `pnpm audit`, `pip-audit`, `composer audit`…). Si `gitleaks` ou `trufflehog` sont installés, lance-les aussi.
 
@@ -78,6 +82,8 @@ Un script ne comprend pas le sens d'une phrase. **Chaque texte visible et chaque
 ## Étape 3 — Tester le site en fonctionnement
 
 Les tests en navigateur sont **obligatoires** pour les points 9, 10, 11, 27 et 28 : un bandeau peut exister dans le code et laisser passer Google Analytics.
+
+**Pour une appli mobile**, le navigateur est remplacé par l'appli lancée sur un **simulateur iOS** (outil iOS Simulator de la session s'il existe, sinon Xcode / `xcrun simctl`) ou un **émulateur Android**, avec l'accord de l'utilisateur : suis `references/mobile.md` §6 (premier lancement sans consentement, demandes d'autorisation, paramètres, suppression du compte, VoiceOver ou TalkBack, grande police). Les points M2, M3, M4, M5 et M7 restent ❓ tant que l'appli n'a pas été lancée.
 
 1. **Lancer le site** : commande de dev ou de preview du projet (ou URL de préproduction fournie). Si le site ne démarre pas, essaie de le faire démarrer (dépendances, variables d'environnement d'exemple) ; à défaut, marque les points concernés ❓ et dis pourquoi.
 2. **Tester avec un navigateur**, par ordre de préférence :
@@ -112,7 +118,7 @@ Lis `references/checklist.md` : **30 points légaux + 15 points sécurité + 7 p
 | `references/licences.md` | Polices, images, icônes, code, contenus IA |
 | `references/securite-owasp.md` | OWASP Top 10 2025 + 5 compléments, tests et corrections |
 | `references/hebergeurs.md` | Hébergeurs et prestataires d'e-mail : offre gratuite et usage pro, contrat de données, pays, comment les reconnaître |
-| `references/mobile.md` | Applis : stores, SDK, permissions |
+| `references/mobile.md` | Applis : règles Apple et Google Play vérifiées, SDK et consentement, permissions, sécurité, tests sur simulateur |
 | `references/international.md` | UK, Suisse, USA, Québec, Brésil, etc. |
 | `references/corrections.md` | Comment corriger chaque problème selon la stack |
 | `references/veille.md` | Règles récentes ou instables à revérifier |
@@ -135,12 +141,12 @@ Lis `references/checklist.md` : **30 points légaux + 15 points sécurité + 7 p
 | ❓ À vérifier | Le test n'a pas pu être fait : dire pourquoi et quoi faire |
 | ➖ Pas concerné | Ne s'applique pas à ce site : dire pourquoi en quelques mots |
 
-**Les 9 catégories, dans cet ordre** (correspondance avec la grille : `checklist.md`, tableau « Catégories du rapport ») : 🏢 Qui est derrière le site · 👤 Données des visiteurs · 🍪 Cookies et pistage · 📝 Textes et promesses · 🛒 Vente et contrats · ♿ Accessibilité · 🔒 Sécurité du site · 🖥️ Hébergement et prestataires · ✉️ E-mail.
+**Les 9 catégories, dans cet ordre** (plus 📱 Appli mobile et stores, avant 🖥️ Hébergement, pour une appli) (correspondance avec la grille : `checklist.md`, tableau « Catégories du rapport ») : 🏢 Qui est derrière le site · 👤 Données des visiteurs · 🍪 Cookies et pistage · 📝 Textes et promesses · 🛒 Vente et contrats · ♿ Accessibilité · 🔒 Sécurité du site · 🖥️ Hébergement et prestataires · ✉️ E-mail.
 
 **Structure** (voir le modèle) : titre et date → **En bref** (verdict 🟢/🟠/🔴 en une phrase, totaux par statut, tableau par catégorie avec une note sur 10, note globale, légende) → **À faire** (tableau numéroté : statut, action, pourquoi, qui, temps) et **À respecter au quotidien** → **Le détail, point par point** (une section par catégorie) → **Ce qui a été corrigé** → avertissement de responsabilité → **Détails techniques** repliés.
 
 Règles d'écriture :
-- **Une ligne par point de la grille, toujours, même quand il est ✅ ou ➖**, dans sa catégorie : symbole → **titre court en gras** → ce qu'on a constaté en une phrase → « → ce qu'il faut faire (action N) » si ce n'est ni ✅ ni ➖. Le lecteur doit pouvoir parcourir les 52 lignes et voir que rien n'a été oublié. Plusieurs constats sur un même point tiennent sur sa ligne (le statut le plus grave l'emporte).
+- **Une ligne par point de la grille, toujours, même quand il est ✅ ou ➖**, dans sa catégorie : symbole → **titre court en gras** → ce qu'on a constaté en une phrase → « → ce qu'il faut faire (action N) » si ce n'est ni ✅ ni ➖. Le lecteur doit pouvoir parcourir les 52 lignes (59 pour une appli) et voir que rien n'a été oublié. Plusieurs constats sur un même point tiennent sur sa ligne (le statut le plus grave l'emporte).
 - **Chaque point apparaît une seule fois.** Les totaux de « En bref » sont **calculés à partir des lignes** du détail.
 - **« À faire »** : une ligne par action, numérotée de 1 à N sans trou, du plus grave au moins grave (failles exploitables et secrets exposés, puis pistage sans accord, puis informations légales manquantes, puis pratiques trompeuses, puis accessibilité bloquante, puis le reste). Un point 🟠, ❌ ou ❓ renvoie à son action. Les **démarches hors grille** (Kbis, boîte e-mail pro, test au lecteur d'écran, révocation d'une clé collée dans la conversation) ont le symbole 🗂️ et ne comptent pas dans les totaux.
 - **Un point ❓ n'est jamais présenté comme bon** : il a son action « Vérifier… » avec « Vous » ou « Claude ».
@@ -156,7 +162,7 @@ Classe toujours ❌ et en tête de « À faire » : traceurs chargés avant cons
 python3 <skill>/scripts/check_report.py CONFORMITE.md
 ```
 
-Il vérifie que chaque ligne du détail a un statut, que le total fait 52, que les totaux et le tableau « En bref » correspondent exactement aux lignes, que « À faire » est numéroté sans trou, que les actions citées existent, et repère le jargon. Corrige jusqu'à ce qu'il n'y ait plus de ❌, et traite ses remarques 🟠 (jargon à expliquer ou à déplacer).
+Il vérifie que chaque ligne du détail a un statut, que le total fait 52 (59 pour une appli), que les totaux et le tableau « En bref » correspondent exactement aux lignes, que « À faire » est numéroté sans trou, que les actions citées existent, et repère le jargon. Corrige jusqu'à ce qu'il n'y ait plus de ❌, et traite ses remarques 🟠 (jargon à expliquer ou à déplacer).
 
 Écris aussi `.claude/.last-audit` (texte simple : date, version du skill, commit git `git rev-parse HEAD`, URL testées) : il sert au mode retest rapide.
 

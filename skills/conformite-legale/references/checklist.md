@@ -123,11 +123,29 @@ Le RGPD (art. 32) impose une sécurité adaptée au risque : une faille qui expo
 
 **E4. Les e-mails du site partent vraiment** — le formulaire vérifie la réponse du service d'envoi avant d'afficher « envoyé » (`res.ok`, `error`) ; l'adresse de destination n'est pas dans la liste de blocage du prestataire (Resend « Suppressions », Brevo, Postmark, SendGrid) ; quota gratuit suffisant ; les alertes automatiques ne peuvent pas s'emballer (S9). [S][Q] · `securite-owasp.md` S9
 
+## J. Appli mobile et stores (seulement pour une appli)
+
+Pour une appli iOS ou Android, ces 7 points s'ajoutent (grille de 59 points). `scripts/audit_mobile.py` + tests sur simulateur ; détails dans `mobile.md`.
+
+**M1. Fiches des stores et déclarations** — « App Privacy » (Apple) et « Sécurité des données » (Google) exactes, SDK compris ; manifeste de confidentialité Apple (`PrivacyInfo.xcprivacy`) ; niveau d'API Android à jour (36 pour les mises à jour depuis le 31/08/2026) ; statut de trader déclaré. [S][Q]
+
+**M2. Consentement avant les SDK de suivi** — aucun SDK de mesure, de publicité ou d'attribution actif avant l'accord (Firebase Analytics désactivé par défaut) ; App Tracking Transparency sur iOS avant le suivi entre applis ; « Refuser » aussi simple qu'« Accepter ». **Test sur l'appli lancée.** [S][N]
+
+**M3. Permissions justifiées** — seulement les permissions utiles, demandées au bon moment, avec un texte précis et en français ; écran d'information avant la localisation en arrière-plan ; déclaration spéciale Google Play pour les permissions très sensibles. [S][N]
+
+**M4. Compte : suppression et connexion** — suppression du compte dans l'appli (et par un lien web pour Google Play) ; si connexion Google ou Facebook, une option équivalente respectueuse de la vie privée sur iOS. [S][N]
+
+**M5. Pages légales dans l'appli** — politique de confidentialité, conditions, mentions légales accessibles depuis l'appli (Paramètres, À propos) et sur la fiche du store. [S][N]
+
+**M6. Sécurité de l'appli** — aucun secret dans l'appli (`.env` embarqué, variables publiques), jetons dans le trousseau sécurisé, trafic chiffré, pas de mode débogage, WebView limitées. [S]
+
+**M7. Accessibilité mobile** — taille du texte du système respectée, boutons et images nommés pour VoiceOver et TalkBack, zones tactiles assez grandes. [S][N]
+
 ---
 
 ## Catégories du rapport
 
-Le rapport range les 52 points en 9 catégories, dans cet ordre (`templates/rapport-conformite.md`) :
+Le rapport range les 52 points en 9 catégories (59 points et 10 catégories pour une appli mobile), dans cet ordre (`templates/rapport-conformite.md`) :
 
 | Catégorie | Points, dans l'ordre des lignes du rapport |
 |---|---|
@@ -140,12 +158,13 @@ Le rapport range les 52 points en 9 catégories, dans cet ordre (`templates/rapp
 | 🔒 Sécurité du site | S4 connexion chiffrée, S11 protections envoyées au navigateur, S14 échanges pages/serveur, S2 fichiers secrets bien cachés, S10 résiste aux robots qui fouillent, S12 aucune clé dans le code, S3 outils à jour, S5 données piégées, S1 chacun ne voit que ce qui le concerne, S6 faille de logique, S13 envois en masse, S9 alertes, S7 comptes et mots de passe, S8 échanges avec d'autres services, S15 IA |
 | 🖥️ Hébergement et prestataires | H1, H2, H3 |
 | ✉️ E-mail | E1, E2, E3, E4 |
+| 📱 Appli mobile et stores (si appli) | M1, M2, M3, M4, M5, M6, M7 |
 
 ---
 
 ## Points additionnels selon le projet
 
-- **Appli mobile** : `mobile.md` (stores, SDK, permissions, suppression de compte).
+- **Appli mobile** : section J ci-dessus et `mobile.md` (stores, SDK, permissions, suppression de compte, tests sur simulateur).
 - **Marchés hors UE** : `international.md`.
 - **IA et contenus d'utilisateurs** : `saas-plateformes.md` §5-6 (DSA : signalement, modération, point de contact ; AI Act : mention « assistant IA »).
 - **Activité réglementée** : `france.md` §3.

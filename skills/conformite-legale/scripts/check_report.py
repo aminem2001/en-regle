@@ -8,7 +8,7 @@ Contrôles :
 - dans « Le détail », chaque point a une ligne qui commence par ✅ 🟠 ❌ ❓ ou ➖ ;
 - le nombre de lignes par statut est égal aux totaux de la phrase « Sur N points
   contrôlés » et du tableau « En bref » (catégorie par catégorie) ;
-- le total fait bien le nombre de points de la grille (52 par défaut) ;
+- le total fait bien le nombre de points de la grille (52, ou 59 pour une appli mobile) ;
 - le tableau « À faire » est numéroté sans trou, et les « action N » citées existent ;
 - aucun ✅ ou ➖ ne renvoie à une action, et chaque 🟠 ❌ ❓ dit quoi faire ;
 - pas de jargon dans la partie principale (sigles, numéros de points, articles de
@@ -50,7 +50,7 @@ def section(text, title_re):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("rapport", nargs="?", default="CONFORMITE.md")
-    ap.add_argument("--points", type=int, default=52, help="Nombre de points de la grille (52 par défaut)")
+    ap.add_argument("--points", type=int, default=0, help="Nombre de points de la grille (par défaut : 52, ou 59 avec la catégorie « Appli mobile »)")
     a = ap.parse_args()
     try:
         text = open(a.rapport, encoding="utf-8").read()
@@ -77,6 +77,8 @@ def main():
             lines.append((current, m.group(1), raw))
         elif re.match(r"^\s*[-*]\s+\S", raw) and current:
             errors.append(f"Ligne sans statut dans « {current} » : {raw.strip()[:80]}")
+    if not a.points:
+        a.points = 59 if any("appli" in norm(c) for c in cats) else 52
     totals = {s: sum(c[s] for c in cats.values()) for s in STATUSES}
     total = sum(totals.values())
     if total != a.points:

@@ -6,7 +6,7 @@
 
 [🟢 / 🟠 / 🔴] **[Verdict en une phrase : peut-on mettre ou laisser le site en ligne ?]** [Rien d'urgent. / Le plus grave en une phrase.]
 
-Sur 52 points contrôlés : **N bons** ✅ · **N moyens** 🟠 · **N pas bons** ❌ · **N à vérifier** ❓ · **N pas concernés** ➖
+Sur 52 points contrôlés (59 pour une appli) : **N bons** ✅ · **N moyens** 🟠 · **N pas bons** ❌ · **N à vérifier** ❓ · **N pas concernés** ➖
 
 | Catégorie | Résultat | Note |
 |---|---|---|
@@ -19,6 +19,7 @@ Sur 52 points contrôlés : **N bons** ✅ · **N moyens** 🟠 · **N pas bons*
 | 🔒 Sécurité du site | … | N/10 |
 | 🖥️ Hébergement et prestataires | … | N/10 |
 | ✉️ E-mail | … | N/10 |
+| 📱 Appli mobile et stores (si appli) | … | N/10 |
 | **Global** | | **N/10** |
 
 Les notes portent sur la loi, la sécurité et la technique. Elles ne jugent pas le design ni la force des textes de vente.
@@ -116,6 +117,18 @@ Les notes portent sur la loi, la sécurité et la technique. Elles ne jugent pas
 - [➖] **Échanges avec d'autres services** : [pas de paiement ni de notification automatique d'un autre service].
 - [➖] **Intelligence artificielle sur le site** : [aucune].
 
+### 📱 Appli mobile et stores
+
+[Seulement pour une appli iOS ou Android : sinon, supprimer cette section, sa ligne dans « En bref » et sa ligne dans la correspondance ; le total passe alors de 59 à 52.]
+
+- [✅] **Fiches des stores exactes** : [données déclarées sur l'App Store et Google Play = ce que font l'appli et ses outils ; manifeste Apple présent ; version d'Android à jour].
+- [✅] **Aucun suivi avant votre accord** : [testé sur l'appli lancée : rien ne part avant « Accepter » ; autorisation Apple demandée avant le suivi publicitaire].
+- [✅] **Autorisations justifiées** : [seulement ce qui sert (position, photos…), demandé au bon moment avec une explication claire en français].
+- [✅] **Suppression du compte** : [possible depuis l'appli, en quelques étapes] ou [➖ pas de compte].
+- [✅] **Pages légales dans l'appli** : [liens dans les Paramètres].
+- [✅] **Appli sécurisée** : [aucun secret dans l'appli, connexions chiffrées, mots de passe et jetons bien rangés].
+- [✅] **Appli utilisable par tous** : [grande police respectée, boutons annoncés par VoiceOver et TalkBack].
+
 ### 🖥️ Hébergement et prestataires
 
 - [✅] **Offre d'hébergement autorisée pour un pro** : [nom de l'hébergeur et de l'offre ; usage commercial autorisé].
@@ -159,6 +172,7 @@ Les notes portent sur la loi, la sécurité et la technique. Elles ne jugent pas
 | 🔒 Sécurité du site | S4, S11, S14, S2, S10, S12, S3, S5, S1, S6, S13, S9, S7, S8, S15 (OWASP Top 10 2025 ; RGPD art. 32) |
 | 🖥️ Hébergement et prestataires | H1, H2, H3 (conditions de l'hébergeur, RGPD art. 28, LCEN art. 1-1) |
 | ✉️ E-mail | E1, E2, E3, E4 |
+| 📱 Appli mobile et stores (si appli) | M1, M2, M3, M4, M5, M6, M7 (règles Apple et Google Play, CNIL) |
 
 Les lignes de chaque catégorie de « Le détail » suivent l'ordre des points ci-dessus.
 

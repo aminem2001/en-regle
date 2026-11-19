@@ -139,7 +139,7 @@ Tu dis « corrige 1 à 4 » ou « corrige tout », et il applique, reteste et me
 
 Le rapport final est écrit **pour le propriétaire du site, pas pour un développeur** : 9 catégories en mots de tous les jours, chaque point sur sa ligne avec ✅ bon · 🟠 moyen · ❌ pas bon · ❓ à vérifier · ➖ pas concerné, une note sur 10 par catégorie et une liste « À faire » numérotée. Le jargon reste dans un bloc replié pour le développeur.
 
-Et selon ton projet : **App Store / Google Play**, **DSA** (contenus d'utilisateurs, marketplaces), **AI Act** (chatbots), et les lois de **13 pays et régions** hors UE (Royaume-Uni, Suisse, Californie, Québec, Brésil, Inde…).
+Et selon ton projet : **applis mobiles** (Flutter, React Native, Expo, Swift, Kotlin… : 7 points de plus sur les règles de l'App Store et de Google Play, testés sur simulateur), **DSA** (contenus d'utilisateurs, marketplaces), **AI Act** (chatbots), et les lois de **13 pays et régions** hors UE (Royaume-Uni, Suisse, Californie, Québec, Brésil, Inde…).
 
 ## 🚀 Installation (30 secondes)
 
@@ -171,7 +171,7 @@ Tu peux aussi donner **ta propre checklist** : il l'utilise comme structure du r
 
 ## 🛠️ Sous le capot
 
-Neuf outils, **zéro dépendance** (Python 3.8+ / Node 18+), plus un test Playwright optionnel :
+Dix outils, **zéro dépendance** (Python 3.8+ / Node 18+), plus un test Playwright optionnel :
 
 | Outil | Ce qu'il vérifie |
 |---|---|
@@ -180,6 +180,7 @@ Neuf outils, **zéro dépendance** (Python 3.8+ / Node 18+), plus un test Playwr
 | `browser_probe.js` | Dans la page : cookies, requêtes tierces, bandeau, contrastes, accessibilité |
 | `live_check.mjs` | Navigateur réel : avant / après « Refuser », clavier, axe-core, captures |
 | `check_headers.py` | HTTPS (avec et sans www), en-têtes, cookies, hébergeur réel et IP contactée, fichiers sensibles, plantages sur adresses inconnues |
+| `audit_mobile.py` | Applis Flutter, React Native, Expo, Swift, Kotlin… : SDK et consentement, ATT, permissions, manifeste Apple, suppression du compte, API Android |
 | `check_email.py` | MX, SPF, DKIM, DMARC, service de redirection des e-mails |
 | `extract_texts.py` | Tous les textes visibles, pour une relecture intégrale |
 | `check_report.py` | Le rapport tombe juste : totaux, numérotation, jargon |
