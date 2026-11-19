@@ -1,6 +1,6 @@
 # Veille : points récents ou instables à revérifier
 
-**Dernière vérification globale : 2026-11-18** (sources officielles : Légifrance, EUR-Lex, CNIL ; à défaut, plusieurs sources spécialisées concordantes).
+**Dernière vérification globale : 2026-11-18** ; hébergeurs et prestataires d'e-mail : **2026-11-19** (à revérifier tous les 3 mois) (sources officielles : Légifrance, EUR-Lex, CNIL ; à défaut, plusieurs sources spécialisées concordantes).
 
 Quand un point ci-dessous concerne le projet et que la date de vérification a plus de 3 mois, refais une recherche rapide (sources officielles d'abord), puis indique dans le rapport ce qui a été confirmé ou non. Si tu trouves un changement, signale-le à l'utilisateur et propose de mettre à jour ce fichier et la référence concernée.
 
@@ -24,3 +24,11 @@ Quand un point ci-dessous concerne le projet et que la date de vérification a p
 | Allégations environnementales (directive (UE) 2024/825) | À appliquer depuis le 27/09/2026 mais **non transposée en France** au 18/11/2026 (projet DDADUE ; mise en demeure UE du 28/05/2026) | Élevée | Légifrance, Assemblée nationale |
 | Garantie de conformité : biens d'occasion | 2 ans ; présomption 12 mois (L217-3, L217-7) | Élevée | Légifrance, economie.gouv.fr |
 | OWASP Top 10 | Édition 2025, finalisée en janvier 2026 (A01 contrôle d'accès … A10 conditions exceptionnelles) | Élevée | owasp.org/Top10/2025 |
+| Vercel Hobby | Usage « personal or non-commercial » seulement (CGU §4, 19/10/2026) ; DPA réservé à Pro et Enterprise (DPA 17/03/2026) | **Élevée (conditions lues le 19/11/2026)** | vercel.com/legal/terms, vercel.com/legal/dpa |
+| Cloudflare offre Free | Pas d'interdiction d'usage commercial ; DPA intégré par référence (convention self-serve §6.1) ; clauses types + DPF (DPA v6.4 du 03/04/2026) | **Élevée (conditions lues le 19/11/2026)** | cloudflare.com/terms, cloudflare.com/cloudflare-customer-dpa |
+| Cloudflare Workers Free : limites | 100 000 requêtes/jour, 10 ms de calcul par requête ; au-delà erreur 1027 / 1102, pas de facturation automatique décrite | Élevée (doc lue le 19/11/2026) | developers.cloudflare.com/workers/platform/limits |
+| GitHub Pages | Interdit pour faire tourner une activité commerciale (boutique, SaaS) ; DPA GitHub hors comptes gratuits | Élevée (doc lue le 19/11/2026) | docs.github.com (GitHub Pages limits), github.com/customer-terms |
+| Netlify offre Free | Usage commercial et DPA pour l'offre gratuite **non vérifiés** (conditions en PDF illisible) | Faible | netlify.com/gdpr-ccpa, convention self-serve |
+| Autres hébergeurs (Firebase, AWS, Azure, Render, OVH, o2switch, IONOS, Hostinger) | Voir `hebergeurs.md` (une ligne par hébergeur, avec ce qui n'a pas pu être vérifié) | Variable | `hebergeurs.md` |
+| Resend | DPA intégré aux conditions ; gratuit 3 000/mois et 100/jour ; région Irlande disponible (données du compte aux États-Unis) ; liste de suppression automatique après un rebond | Élevée (lu le 19/11/2026) | resend.com/legal/dpa, resend.com/pricing |
+| Gmail gratuit / Google Workspace | Workspace : Cloud Data Processing Addendum ; Gmail gratuit : aucune source officielle d'un DPA | Moyenne (absence de source) | cloud.google.com/terms/data-processing-addendum |

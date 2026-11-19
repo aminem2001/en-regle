@@ -51,6 +51,7 @@ S1 à S10 : OWASP Top 10 2025 · S11 à S15 : compléments
 ## S9. A09 Journalisation et alertes
 - **Vérifier** : connexions, échecs, changements de droits et erreurs serveur journalisés ; **aucun mot de passe, jeton ou donnée de carte dans les journaux** ; durée de conservation limitée (6 mois à 1 an, recommandation CNIL) ; alerte en cas d'anomalie.
 - **Tester** : rechercher `console.log(req.body)`, `logger.info(user)`, journalisation de mots de passe.
+- **Alertes qui s'emballent** : un e-mail envoyé à chaque erreur (`onRequestError` de Next.js, `process.on('uncaughtException')`, gestionnaire d'erreurs Express, Django, Rails…) peut partir des centaines de fois quand des robots fouillent le site. Vérifier que les **404 et redirections sont ignorées** (`NEXT_NOT_FOUND`, `NEXT_HTTP_ERROR_FALLBACK`, `NEXT_REDIRECT`, statut < 500), que la limite d'envoi est **partagée** (pas une variable en mémoire sur un hébergement serverless ou edge) et que l'alerte ne contient **aucune donnée personnelle**. Sinon : quota du service d'envoi épuisé, adresse bloquée, vraies demandes de clients perdues. `audit_static.py` signale ces cas.
 
 ## S10. A10 Mauvaise gestion des conditions exceptionnelles
 - **Vérifier** : erreurs attrapées et renvoyées au client sous forme générique ; pas de « fail-open » (une erreur dans la vérification des droits ne doit pas laisser passer) ; promesses non gérées ; limites de taille sur les requêtes et les téléversements.
@@ -74,11 +75,13 @@ Cookies de session : `Secure`, `HttpOnly`, `SameSite=Lax` (ou `Strict`), durée 
 ## S12. Secrets
 - **Vérifier** : aucune clé, aucun mot de passe et aucun jeton dans le code, l'historique Git ou le bundle envoyé au navigateur (variables `NEXT_PUBLIC_`, `VITE_`, `PUBLIC_` réservées aux valeurs publiques) ; `.env` dans `.gitignore`.
 - **Tester** : `audit_static.py` (motifs de clés connues) ; `git log -p | grep` ciblé si nécessaire ; gitleaks ou trufflehog s'ils sont installés.
+- **Secret collé dans une conversation** (avec Claude, un support, un forum) : il doit être considéré comme exposé, même s'il n'est pas dans le code. Le révoquer et en créer un nouveau.
 - **Corriger** : déplacer en variables d'environnement serveur, **révoquer et régénérer** toute clé qui a été commitée (la supprimer du code ne suffit pas), ajouter `.env*` au `.gitignore`.
 
 ## S13. Abus et limitation
 - Rate limiting sur la connexion, l'inscription, la réinitialisation de mot de passe, les formulaires de contact et les routes coûteuses (IA, e-mails, SMS).
 - Anti-spam : pot de miel, Turnstile, Friendly Captcha ou hCaptcha plutôt que reCAPTCHA (voir cookies).
+- **Hébergement serverless ou edge** (Vercel, Netlify, Cloudflare Workers, AWS Lambda…) : un compteur en mémoire (`new Map()` + `Date.now()`) n'est pas partagé entre les instances, la limite est donc contournable. Utiliser un stockage partagé (Cloudflare KV ou Durable Objects, Upstash, Redis) ou la règle de limitation de l'hébergeur (Cloudflare Rate Limiting, Vercel Firewall). `audit_static.py` le signale quand il détecte les deux.
 
 ## S14. API (OWASP API Top 10)
 - Autorisation au niveau de chaque objet (BOLA) et de chaque propriété (ne pas renvoyer `passwordHash`, `role`, données internes).

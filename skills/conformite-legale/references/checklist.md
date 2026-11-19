@@ -1,4 +1,4 @@
-# Grille d'audit : 30 points légaux + 15 points sécurité
+# Grille d'audit : 30 points légaux + 15 points sécurité + 7 points hébergement et e-mail (52 points)
 
 Grille de référence du skill. Chaque point indique **quoi vérifier**, **comment le tester** et **où trouver la correction**. Elle applique le droit français et européen (RGPD, CNIL, Code de la consommation, RGAA/EAA, DSA, AI Act) ; les règles d'autres pays s'ajoutent seulement si le projet les vise (`international.md`).
 
@@ -15,7 +15,7 @@ Statuts : ✅ OK · ⚠️ À améliorer · ❌ Manquant / non conforme · ➖ N
 
 ## A. Pages et informations légales
 
-**1. Mentions légales** — éditeur selon son statut, directeur de publication, hébergeur, contact. [S][N][M] · `france.md` §1-3 · modèle `templates/mentions-legales.md`
+**1. Mentions légales** — éditeur selon son statut, directeur de publication, hébergeur (nom, adresse, téléphone : **exact**, voir H3), contact joignable (voir E1). [S][N][M] · `france.md` §1-3 · modèle `templates/mentions-legales.md`
 
 **2. Politique de confidentialité** — existe, exacte (correspond aux traitements et outils réellement présents), complète (art. 13 RGPD). [S][M] · `rgpd-cookies.md` §2 · `templates/politique-confidentialite.md`
 
@@ -51,7 +51,7 @@ Statuts : ✅ OK · ⚠️ À améliorer · ❌ Manquant / non conforme · ➖ N
 
 **16. Durées de conservation** — définies, cohérentes avec la politique, et appliquées (purge ou anonymisation automatique, ou procédure). [M][Q]
 
-**17. Sous-traitants, transferts, registre** — liste des prestataires, contrats de sous-traitance (DPA), transferts hors UE encadrés, registre des traitements, procédure de violation de données sous 72 h. [S][Q] · `rgpd-cookies.md` §3, §9
+**17. Sous-traitants, transferts, registre** — liste des prestataires **comparée aux prestataires réels** (hébergeur détecté, MX et service de redirection, service d'envoi, boîte de réception, API appelées), contrats de sous-traitance (DPA), transferts hors UE encadrés, registre des traitements, procédure de violation de données sous 72 h. [S][Q] · `rgpd-cookies.md` §3, §9
 
 **18. Mineurs** — si le public peut être mineur : âge minimum, consentement parental en dessous de 15 ans, pas de profilage publicitaire. [M][Q] · `rgpd-cookies.md` §8
 
@@ -97,13 +97,49 @@ Le RGPD (art. 32) impose une sécurité adaptée au risque : une faille qui expo
 **S6. A06 Conception non sécurisée** (logique métier : prix modifiable côté client, coupons réutilisables, absence de limites)
 **S7. A07 Défaillances d'authentification** (force brute, sessions, réinitialisation de mot de passe, 2FA pour l'admin)
 **S8. A08 Intégrité des logiciels et des données** (désérialisation, webhooks non signés, mises à jour non vérifiées)
-**S9. A09 Journalisation et alertes** (événements de sécurité journalisés sans données sensibles, alertes, conservation limitée)
-**S10. A10 Mauvaise gestion des conditions exceptionnelles** (erreurs non gérées, « fail-open », traces de pile exposées)
+**S9. A09 Journalisation et alertes** (événements de sécurité journalisés sans données sensibles, alertes qui ignorent les 404 et ne peuvent pas s'emballer, conservation limitée)
+**S10. A10 Mauvaise gestion des conditions exceptionnelles** (erreurs non gérées, « fail-open », traces de pile exposées ; une adresse inconnue — `/.git/config`, `/<aléa>.php` — doit répondre 404 vite, sans erreur 5xx : `check_headers.py --probe-files`)
 **S11. En-têtes HTTP et cookies** (CSP, HSTS, X-Content-Type-Options, frame-ancestors, Referrer-Policy, Permissions-Policy ; cookies `Secure`, `HttpOnly`, `SameSite`)
 **S12. Secrets** (aucune clé d'API, mot de passe ou jeton dans le code, le dépôt Git ou le bundle client)
-**S13. Abus et limitation** (rate limiting sur la connexion, l'inscription, les formulaires, l'API ; anti-spam respectueux de la vie privée)
+**S13. Abus et limitation** (rate limiting sur la connexion, l'inscription, les formulaires, l'API ; anti-spam respectueux de la vie privée ; sur un hébergement serverless/edge, compteur **partagé** et pas en mémoire)
 **S14. API** (OWASP API Top 10 : autorisation au niveau de chaque objet, exposition excessive de données, validation des entrées)
 **S15. Fonctionnalités IA** (OWASP LLM Top 10 : injection de prompt, fuite de données dans les prompts, sorties non filtrées, clés d'API côté client, coût non plafonné)
+
+## H. Hébergement et prestataires
+
+**H1. Offre autorisée pour un pro** — l'offre d'hébergement utilisée (gratuite ou payante) autorise un usage commercial pour ce site. Détection de l'hébergeur [S][H], offre demandée [Q]. ❌ si l'offre l'interdit (ex. Vercel Hobby, GitHub Pages pour une boutique). · `hebergeurs.md`
+
+**H2. Contrats de protection des données** — un contrat de traitement des données (DPA, art. 28 RGPD) couvre l'offre utilisée chez l'hébergeur et chez chaque prestataire qui reçoit des données (envoi d'e-mails, boîte de réception, formulaires, outils). [Q][M] · `hebergeurs.md`, `rgpd-cookies.md` §3
+
+**H3. Hébergeur annoncé = hébergeur réel** — le nom et l'adresse de l'hébergeur des mentions légales (et de la politique de confidentialité) correspondent à l'hébergeur qui sert réellement le site (`check_headers.py` : « Hébergeur détecté », IP contactée). ❌ si différent. [H][M]
+
+## I. E-mail
+
+**E1. L'adresse de contact reçoit bien** — chaque adresse affichée sur le site a des serveurs de réception (MX) ; un vrai message envoyé par l'utilisateur a été reçu, spams compris. **❓ tant qu'un vrai envoi n'a pas été confirmé.** Un service de redirection (Cloudflare, registrar, ImprovMX) est un sous-traitant à lister. [H][Q] · `scripts/check_email.py`
+
+**E2. E-mails signés au nom du domaine** — SPF (un seul enregistrement, pas de `+all`), DKIM du service d'envoi, DMARC présent. [H] · `scripts/check_email.py`, `corrections.md` §9
+
+**E3. Pas de spams** — les e-mails du site (devis, confirmations) arrivent en boîte de réception ; sinon le délai de réponse promis sur le site n'est plus tenable. [Q] · `corrections.md` §9
+
+**E4. Les e-mails du site partent vraiment** — le formulaire vérifie la réponse du service d'envoi avant d'afficher « envoyé » (`res.ok`, `error`) ; l'adresse de destination n'est pas dans la liste de blocage du prestataire (Resend « Suppressions », Brevo, Postmark, SendGrid) ; quota gratuit suffisant ; les alertes automatiques ne peuvent pas s'emballer (S9). [S][Q] · `securite-owasp.md` S9
+
+---
+
+## Catégories du rapport
+
+Le rapport range les 52 points en 9 catégories, dans cet ordre (`templates/rapport-conformite.md`) :
+
+| Catégorie | Points, dans l'ordre des lignes du rapport |
+|---|---|
+| 🏢 Qui est derrière le site | 1, 8 |
+| 👤 Données des visiteurs | 2, 13, 14, 15, 16, 17, 18 |
+| 🍪 Cookies et pistage | 10, 9, 11, 3, 12 |
+| 📝 Textes et promesses | 21, 23, 24, 22, 25 |
+| 🛒 Vente et contrats | 5, 4, 6, 7, 19, 20 |
+| ♿ Accessibilité | 26, 27, 28, 29, 30 |
+| 🔒 Sécurité du site | S4 connexion chiffrée, S11 protections envoyées au navigateur, S14 échanges pages/serveur, S2 fichiers secrets bien cachés, S10 résiste aux robots qui fouillent, S12 aucune clé dans le code, S3 outils à jour, S5 données piégées, S1 chacun ne voit que ce qui le concerne, S6 faille de logique, S13 envois en masse, S9 alertes, S7 comptes et mots de passe, S8 échanges avec d'autres services, S15 IA |
+| 🖥️ Hébergement et prestataires | H1, H2, H3 |
+| ✉️ E-mail | E1, E2, E3, E4 |
 
 ---
 

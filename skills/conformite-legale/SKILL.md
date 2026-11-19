@@ -1,6 +1,6 @@
 ---
 name: conformite-legale
-description: Audite, teste et corrige la conformité légale et la sécurité d'un site web, d'un e-commerce, d'un SaaS ou d'une appli mobile — France, Union européenne et monde. Grille de 30 points légaux (mentions légales LCEN, RGPD, politique de confidentialité, cookies et bandeau CNIL, CGV/CGU, rétractation et bouton de rétractation, remboursement, médiateur, garanties, résiliation en 3 clics, dark patterns, faux avis, allégations, prospection e-mail, licences, accessibilité RGAA/EAA/WCAG, DSA, AI Act) + 15 points sécurité (OWASP Top 10 2025, en-têtes HTTP, secrets, API, IA). Analyse le code, teste le site dans un vrai navigateur (traceurs avant consentement, contrastes, clavier), rédige un rapport, puis corrige après validation et retest. Utilise ce skill dès que l'utilisateur veut déployer, lancer ou mettre en ligne un site ou une appli « en règle », « conforme », « sans risque juridique », ou parle de RGPD, GDPR, CNIL, cookies, bandeau cookies, mentions légales, politique de confidentialité, CGV, CGU, RGAA, accessibilité, WCAG, DGCCRF, OWASP, sécurité avant mise en production, audit légal — même s'il ne demande pas explicitement un audit.
+description: Audite, teste et corrige la conformité légale et la sécurité d'un site web, d'un e-commerce, d'un SaaS ou d'une appli mobile — France, Union européenne et monde. Grille de 52 points : 30 points légaux (mentions légales LCEN, RGPD, politique de confidentialité, cookies et bandeau CNIL, CGV/CGU, rétractation et bouton de rétractation, remboursement, médiateur, garanties, résiliation en 3 clics, dark patterns, faux avis, allégations, prospection e-mail, licences, accessibilité RGAA/EAA/WCAG, DSA, AI Act) + 15 points sécurité (OWASP Top 10 2025, en-têtes HTTP, secrets, API, IA) + 7 points hébergement et e-mail (offre gratuite autorisée pour un pro, contrat de données DPA, hébergeur réel, MX, SPF, DKIM, DMARC). Analyse le code, teste le site dans un vrai navigateur (traceurs avant consentement, contrastes, clavier), vérifie l'hébergeur et l'e-mail, rédige un rapport simple par catégorie, puis corrige après validation et retest. Utilise ce skill dès que l'utilisateur veut déployer, lancer ou mettre en ligne un site ou une appli « en règle », « conforme », « sans risque juridique », ou parle de RGPD, GDPR, CNIL, cookies, bandeau cookies, mentions légales, politique de confidentialité, CGV, CGU, RGAA, accessibilité, WCAG, DGCCRF, OWASP, sécurité avant mise en production, audit légal — même s'il ne demande pas explicitement un audit.
 ---
 
 # Conformité légale et sécurité des sites et applis
@@ -17,6 +17,7 @@ Objectif : qu'un site ou une appli puisse être mis en ligne **sans exposer son 
 - **Tester uniquement le projet de l'utilisateur** : en local de préférence. Aucun test de sécurité actif sur un site en production ou sur un service tiers sans son accord explicite.
 - **Tu n'es pas avocat.** Dis-le une fois dans le rapport, en précisant que le rapport n'est pas un conseil juridique, ne garantit pas la conformité et que l'éditeur reste seul responsable de son site, et indique précisément quand un juriste est nécessaire (activité réglementée, données de santé, mineurs, grosses volumétries, litige en cours). Ne noie pas chaque paragraphe d'avertissements.
 - **Ne pas affirmer qu'un point est conforme sans l'avoir vérifié.** Si un test n'a pas pu être fait (pas de navigateur, site qui ne démarre pas), le statut est ❓ avec la raison.
+- **Secret collé dans la conversation** (clé d'API, mot de passe, jeton) : ne pas l'utiliser ni le recopier ; demander à l'utilisateur de le **révoquer** et d'en créer un nouveau qu'il mettra lui-même dans les variables d'environnement ; ajouter une action 🗂️ « Vous » au rapport jusqu'à ce qu'il confirme. Aucun script ne le voit, puisqu'il n'est pas dans le code.
 
 ## Étape 1 — Cadrer (lire avant de demander)
 
@@ -30,6 +31,8 @@ Explore le projet : manifestes (`package.json`, `composer.json`, `pubspec.yaml`,
 | Mineurs ? Données sensibles ? Activité réglementée ? IA ? | Règles spécifiques, avis juridique |
 | Comment lancer le site en local (commande, port) ou URL de préproduction | Indispensable pour les tests en navigateur |
 | Informations d'identité disponibles (SIRET, hébergeur, médiateur…) | Pour remplir les pages sans rien inventer |
+| **Offre d'hébergement utilisée** (gratuite ou payante, laquelle) | Une offre gratuite peut interdire l'usage commercial ou ne pas avoir de contrat de données (`references/hebergeurs.md`) |
+| **Où arrivent les e-mails** du site et de l'adresse de contact (Gmail, Outlook, Workspace…) et quel service les envoie | Destinataires de données invisibles dans le code ; Gmail gratuit n'a pas de contrat de données |
 
 Si l'utilisateur ne sait pas, prends l'hypothèse la plus protectrice et note-la.
 
@@ -41,7 +44,8 @@ Lance les deux analyses statiques (Python 3.8+, aucune dépendance) :
 
 ```bash
 python3 <skill>/scripts/scan_trackers.py <projet>    # traceurs, bandeau, pages légales, services tiers
-python3 <skill>/scripts/audit_static.py <projet>     # accessibilité, sécurité OWASP, dark patterns, allégations, e-mails, licences
+python3 <skill>/scripts/audit_static.py <projet>     # accessibilité, sécurité OWASP, dark patterns, allégations, e-mails, licences,
+                                                     # limitation anti-abus en mémoire, alertes qui s'emballent, envoi d'e-mail non vérifié
 ```
 
 Puis audite les dépendances avec l'outil de la stack (`npm audit --omit=dev`, `pnpm audit`, `pip-audit`, `composer audit`…). Si `gitleaks` ou `trufflehog` sont installés, lance-les aussi.
@@ -67,6 +71,7 @@ Un script ne comprend pas le sens d'une phrase. **Chaque texte visible et chaque
 3. **Cartographie des données (RGPD/CNIL)** : liste **chaque** collecte ou envoi de données dans le code — formulaires, `fetch`/appels serveur, API tierces, e-mails, journaux (`console.log`, logger), adresse IP (limitation, statistiques), `localStorage`/`sessionStorage`/cookies, polices et scripts externes. Puis vérifie dans **les deux sens** :
    - tout ce que fait le code figure dans la politique de confidentialité (finalité, base légale, durée, destinataire, transfert hors UE) ;
    - tout ce que dit la politique existe réellement dans le code (une politique qui décrit un traitement inexistant est elle-même inexacte).
+   - **Prestataires réels ↔ déclarés** : construis la liste des prestataires réels à partir de l'hébergeur détecté (`check_headers.py`), des MX et du service de redirection (`check_email.py`), du service d'envoi d'e-mails, de la boîte de réception (réponse de l'utilisateur), des API appelées dans le code (`fetch("https://api.…")`) et des polices ou scripts externes. Compare avec les destinataires de la politique de confidentialité et l'hébergeur des mentions légales, **dans les deux sens** (un ancien prestataire encore cité est aussi un écart), et mets le tableau « réel / déclaré / écart » dans les détails techniques.
 4. **Accessibilité (RGAA)** : au-delà d'axe-core, vérifie à la lecture du code les critères qu'aucun outil automatique ne couvre : animations et contenus en mouvement (pause, `prefers-reduced-motion`), alternatives des contenus non textuels, ordre de lecture, messages d'erreur des formulaires, changements de contexte, textes en image.
 5. Note dans la section technique repliée du rapport le nombre de fichiers et de textes relus et chaque constat avec `fichier:ligne` ; dans la partie principale, chaque constat devient une action en mots simples. Ne conclus pas sur un point légal tant que cette lecture n'est pas faite.
 
@@ -84,12 +89,17 @@ Les tests en navigateur sont **obligatoires** pour les points 9, 10, 11, 27 et 2
    - S'il n'y a **ni cookie ni requête vers un traceur**, l'absence de bouton « Refuser » est normale : le script l'affiche « ➖ sans objet ».
    - Si une page renvoie une **protection anti-robots** (Vercel Security Checkpoint, Cloudflare…), le script l'affiche « ❓ page bloquée » au lieu de tester la page de contrôle : refais les tests sur la version de production lancée en local. `check_headers.py` fait de même pour les en-têtes.
    - Les éléments des outils de développement (barre Next.js, Vite, Astro…) sont ignorés au test clavier. Si le script signale un **serveur de développement**, refais les tests d'en-têtes et de scripts sur la version de production (`build` puis `start`/`preview`), car la politique de sécurité et les scripts y sont différents.
-4. **Tester les en-têtes HTTP** : `python3 <skill>/scripts/check_headers.py <url>` (ajouter `--probe-files` pour vérifier que `.env` et `.git` ne sont pas servis). De préférence sur la version de production, pas sur le serveur de développement.
-5. **Contrastes** à corriger : `python3 <skill>/scripts/contrast.py <texte> <fond>` donne le ratio et une couleur conforme proche.
+4. **Tester les en-têtes HTTP, l'hébergeur et la résistance aux robots** : `python3 <skill>/scripts/check_headers.py <url> --probe-files`, sur la version en ligne (ou de production). Il affiche :
+   - l'**hébergeur détecté** et l'**adresse IP réellement contactée**, et compare avec l'hébergeur cité dans les mentions légales (trouvées dans les liens de l'accueil, ou `--mentions <url>`) ;
+   - les redirections de **toutes les variantes** (`http://` et `https://`, avec et sans `www`) : chacune doit finir en `https://` sur l'adresse principale ;
+   - la **liste des chemins testés** avec statut et durée : un fichier servi, une erreur 5xx, une réponse lente (> 3 s) ou pas de réponse sur une adresse inconnue sont des constats (un robot qui fouille peut faire planter le site et déclencher des alertes en masse).
+   - **Après un changement d'hébergeur ou de DNS**, ajoute `--resolve-via 1.1.1.1` : le nom est résolu par un DNS public et cette adresse est forcée, pour ne pas tester l'ancien hébergeur resté dans le cache de l'ordinateur. Ne conclus pas avant d'avoir vu dans « Hébergeur détecté » le nouvel hébergeur.
+5. **Tester l'e-mail** : `python3 <skill>/scripts/check_email.py <domaine> --textes textes-visibles.md` (MX de chaque adresse affichée, SPF, DKIM, DMARC, service de redirection). Puis **demande à l'utilisateur d'envoyer un vrai message** à l'adresse de contact et une demande par le formulaire, et de confirmer la réception (spams compris) : le point « l'adresse de contact reçoit bien » reste ❓ tant que ce n'est pas confirmé.
+6. **Contrastes** à corriger : `python3 <skill>/scripts/contrast.py <texte> <fond>` donne le ratio et une couleur conforme proche.
 
 ## Étape 4 — Évaluer selon la grille
 
-Lis `references/checklist.md` : **30 points légaux + 15 points sécurité**. Évalue chaque point, en lisant les références utiles au projet :
+Lis `references/checklist.md` : **30 points légaux + 15 points sécurité + 7 points hébergement et e-mail (52 points)**. Évalue chaque point, en lisant les références utiles au projet :
 
 | Fichier | Contenu |
 |---|---|
@@ -101,6 +111,7 @@ Lis `references/checklist.md` : **30 points légaux + 15 points sécurité**. É
 | `references/pratiques-trompeuses.md` | Dark patterns, avis, allégations commerciales et environnementales |
 | `references/licences.md` | Polices, images, icônes, code, contenus IA |
 | `references/securite-owasp.md` | OWASP Top 10 2025 + 5 compléments, tests et corrections |
+| `references/hebergeurs.md` | Hébergeurs et prestataires d'e-mail : offre gratuite et usage pro, contrat de données, pays, comment les reconnaître |
 | `references/mobile.md` | Applis : stores, SDK, permissions |
 | `references/international.md` | UK, Suisse, USA, Québec, Brésil, etc. |
 | `references/corrections.md` | Comment corriger chaque problème selon la stack |
@@ -110,91 +121,46 @@ Lis `references/checklist.md` : **30 points légaux + 15 points sécurité**. É
 
 ## Étape 5 — Rapport, puis STOP
 
-Écris `CONFORMITE.md` à la racine du projet. **Le rapport s'adresse au propriétaire du site, pas à un développeur** : phrases courtes en français courant, aucun jargon dans la partie principale (pas de numéro de point, de chemin de fichier, de nom d'article de loi ou de sigle non expliqué). Tous les détails techniques vont dans la section repliée en bas. Utilise **exactement** cette structure (comparable d'un audit à l'autre) :
+**Avant d'écrire** : si un `CONFORMITE.md` existe déjà, demande à l'utilisateur si les actions « Vous » de l'audit précédent ont été faites (révocation de clé, DPA signé, Kbis…), pour ne pas laisser dans le rapport une étape déjà réglée.
 
-```markdown
-# Conformité du site [nom]
+Écris `CONFORMITE.md` à la racine du projet **en partant de `templates/rapport-conformite.md`** (même structure à chaque audit, pour pouvoir comparer). **Le rapport s'adresse au propriétaire du site, pas à un développeur** : n'importe qui doit voir tout de suite, pour chaque point, si c'est bon, moyen ou pas bon.
 
-**Dernier contrôle : [date en toutes lettres]** (outil En règle [version])
+**Les 5 statuts** (les seuls utilisés dans tout le rapport) :
 
-## En bref
-
-[🟢 / 🟠 / 🔴] **[Verdict en une phrase : peut-on mettre / laisser le site en ligne ?]** Sur les 45 points contrôlés : **N sont bons**, **N ne concernent pas votre site**, **N demandent une action**, dont N urgente(s).
-
-[🔴 Le problème le plus grave en une ou deux phrases, s'il y en a un.]
-
----
-
-## ⏳ Ce qu'il reste à faire
-
-### 🔴 Urgent
-| N° | À faire | Pourquoi | Qui |
-|---|---|---|---|
-| 1 | **[Action concrète]** | [Conséquence pour l'éditeur, en mots simples : amende, perte de clients…] | [Vous / Claude / Vous + Claude (durée)] |
-
-### 🟠 Important
-[Même tableau, numérotation continue.]
-
-### 🟡 Conseillé
-[Même tableau, numérotation continue.]
-
-### 📌 À respecter au quotidien
-[Règles qui conditionnent la conformité (ex. « clientèle professionnelle uniquement ») et règles à connaître pour une activité future probable (prospection, newsletter…). Omettre si rien.]
-
----
-
-## ✅ Tout ce qui est bon
-
-### [Thème : Pages légales / Données personnelles (RGPD) / Cookies et pistage / Textes et pratiques commerciales / Vente en ligne / Accessibilité / Sécurité…]
-- ✅ **[Ce qui est conforme]** : [preuve en une phrase simple].
-
-[Un thème par groupe de points ✅ ; liste TOUS les points conformes, pas un échantillon.]
-
----
-
-## ➖ Ne concerne pas votre site (N points)
-
-[Liste sur une ligne, séparée par « · », avec la raison entre parenthèses quand elle n'est pas évidente.]
-
----
-
-## 🛠️ Ce qui a été corrigé
-
-| Date | Correction |
+| Symbole | Veut dire |
 |---|---|
-[Vide au premier audit : écrire « Rien pour l'instant. »]
+| ✅ Bon | Vérifié, rien à faire |
+| 🟠 Moyen | Ça marche, mais peut être amélioré, ou petit risque |
+| ❌ Pas bon | À corriger : risque d'amende, de faille ou de perte de clients |
+| ❓ À vérifier | Le test n'a pas pu être fait : dire pourquoi et quoi faire |
+| ➖ Pas concerné | Ne s'applique pas à ce site : dire pourquoi en quelques mots |
 
----
+**Les 9 catégories, dans cet ordre** (correspondance avec la grille : `checklist.md`, tableau « Catégories du rapport ») : 🏢 Qui est derrière le site · 👤 Données des visiteurs · 🍪 Cookies et pistage · 📝 Textes et promesses · 🛒 Vente et contrats · ♿ Accessibilité · 🔒 Sécurité du site · 🖥️ Hébergement et prestataires · ✉️ E-mail.
 
-> **Important :** ce rapport est produit par un outil automatique et relu par une IA. Ce n'est pas un conseil juridique et il ne garantit pas la conformité. Vous restez responsable de votre site. [Quand un juriste est nécessaire pour ce projet, le dire ici.]
+**Structure** (voir le modèle) : titre et date → **En bref** (verdict 🟢/🟠/🔴 en une phrase, totaux par statut, tableau par catégorie avec une note sur 10, note globale, légende) → **À faire** (tableau numéroté : statut, action, pourquoi, qui, temps) et **À respecter au quotidien** → **Le détail, point par point** (une section par catégorie) → **Ce qui a été corrigé** → avertissement de responsabilité → **Détails techniques** repliés.
 
-<details>
-<summary><b>Comment le contrôle a été fait</b> (pour un développeur)</summary>
+Règles d'écriture :
+- **Une ligne par point de la grille, toujours, même quand il est ✅ ou ➖**, dans sa catégorie : symbole → **titre court en gras** → ce qu'on a constaté en une phrase → « → ce qu'il faut faire (action N) » si ce n'est ni ✅ ni ➖. Le lecteur doit pouvoir parcourir les 52 lignes et voir que rien n'a été oublié. Plusieurs constats sur un même point tiennent sur sa ligne (le statut le plus grave l'emporte).
+- **Chaque point apparaît une seule fois.** Les totaux de « En bref » sont **calculés à partir des lignes** du détail.
+- **« À faire »** : une ligne par action, numérotée de 1 à N sans trou, du plus grave au moins grave (failles exploitables et secrets exposés, puis pistage sans accord, puis informations légales manquantes, puis pratiques trompeuses, puis accessibilité bloquante, puis le reste). Un point 🟠, ❌ ou ❓ renvoie à son action. Les **démarches hors grille** (Kbis, boîte e-mail pro, test au lecteur d'écran, révocation d'une clé collée dans la conversation) ont le symbole 🗂️ et ne comptent pas dans les totaux.
+- **Un point ❓ n'est jamais présenté comme bon** : il a son action « Vérifier… » avec « Vous » ou « Claude ».
+- **Interdit dans la partie principale** : sigles non expliqués (OWASP, CSP, HSTS, XSS, SSRF, DPA, LCEN, RGAA, WCAG…), numéros de points, chemins de fichiers, articles de loi. Dis ce que ça protège (« protection contre l'ajout de code malveillant dans les pages » plutôt que « CSP »). Si un mot technique est inévitable, explique-le entre parenthèses la première fois (« contrat de protection des données (DPA) »). Tout le technique va dans le bloc replié, avec la correspondance catégorie → points → références.
+- **Notes sur 10** : pour chaque catégorie, moyenne des points évalués (✅ = 10, 🟠 = 7, ❌ = 0 ; ➖ et ❓ ne comptent pas), arrondie au demi-point ; un ❌ limite la note de sa catégorie à 5. Catégorie entièrement ➖ : « — ». Note globale = même calcul sur tous les points évalués. Dis que les notes ne jugent ni le design ni les textes de vente.
+- **Verdict** : 🔴 s'il y a un ❌ urgent (voir ci-dessous) ; 🟠 s'il reste un ❌ ou un ❓ important ; 🟢 sinon.
 
-- Tests réalisés : analyse du code, lecture intégrale (N textes), navigateur (pages, version testée, ❓ et raison si bloqué), en-têtes HTTP, dépendances.
-- Grille détaillée : tableau `| # | Point | Statut | Où (fichier:ligne) | Constat |` des 30 points légaux et 15 points de sécurité.
-- Traceurs et services tiers : service, domaine, chargé avant consentement, consentement requis.
-- Données collectées : cartographie code → politique et politique → code.
-- Hypothèses, faux positifs écartés, points de `veille.md` revérifiés en ligne, limites.
+Classe toujours ❌ et en tête de « À faire » : traceurs chargés avant consentement, absence de bouton « Refuser » équivalent, mentions légales ou politique de confidentialité absentes, absence d'information sur la rétractation ou de fonction de rétractation pour un site marchand, absence de médiateur, case de consentement pré-cochée, secret exposé, contrôle d'accès absent sur des données personnelles, injection exploitable, offre d'hébergement qui interdit l'usage commercial, adresse de contact affichée qui ne reçoit pas.
 
-</details>
+**Vérification obligatoire avant de présenter le rapport** :
+
+```bash
+python3 <skill>/scripts/check_report.py CONFORMITE.md
 ```
 
-Règles de rédaction :
-- **Chaque point de la grille apparaît une fois** : dans « Ce qu'il reste à faire » (❌, ⚠️, ❓ à vérifier), dans « Tout ce qui est bon » (✅) ou dans « Ne concerne pas votre site » (➖). Les trois nombres de « En bref » doivent faire 45 (plus les points additionnels éventuels).
-- Un point ❓ (non vérifié) va dans « Ce qu'il reste à faire » avec l'action « vérifier… » : ne jamais le présenter comme bon.
-- Les démarches hors code (registre, DPA, médiateur, Kbis, révocation de clé) sont des lignes du tableau d'actions comme les autres, avec « Vous » dans « Qui ».
-- Les informations à fournir (SIRET, hébergeur, médiateur…) apparaissent comme actions « Vous ».
-- Le statut technique (✅ ⚠️ ❌ ➖ ❓) et la gravité restent utilisés dans la grille détaillée repliée.
+Il vérifie que chaque ligne du détail a un statut, que le total fait 52, que les totaux et le tableau « En bref » correspondent exactement aux lignes, que « À faire » est numéroté sans trou, que les actions citées existent, et repère le jargon. Corrige jusqu'à ce qu'il n'y ait plus de ❌, et traite ses remarques 🟠 (jargon à expliquer ou à déplacer).
 
-Statuts : ✅ OK · ⚠️ À améliorer · ❌ Manquant ou non conforme · ➖ Non applicable · ❓ Non vérifié (raison).
-Gravité : 🔴 Urgent (sanction directe, faille exploitable, contrôle fréquent, perte de clients) · 🟠 Important · 🟡 Conseillé.
+Écris aussi `.claude/.last-audit` (texte simple : date, version du skill, commit git `git rev-parse HEAD`, URL testées) : il sert au mode retest rapide.
 
-Classe toujours en 🔴 : traceurs chargés avant consentement, absence de bouton « Refuser » équivalent, mentions légales ou politique de confidentialité absentes, absence d'information sur la rétractation ou de fonction de rétractation pour un site marchand, absence de médiateur, case de consentement pré-cochée, secret exposé, contrôle d'accès absent sur des données personnelles, injection exploitable.
-
-**Ordre dans chaque niveau** : d'abord les failles de sécurité exploitables et les secrets exposés, puis les traceurs sans consentement, puis les informations légales obligatoires manquantes, puis les pratiques trompeuses, puis l'accessibilité bloquante.
-
-Présente ensuite à l'utilisateur un résumé court (verdict, actions urgentes et importantes) et **arrête-toi** : demande ce qu'il valide (tout, une sélection de numéros d'actions, ou rien) et les informations d'identité manquantes. Ne modifie rien avant sa réponse.
+Présente ensuite à l'utilisateur un résumé court (verdict, actions ❌ et ❓) et **arrête-toi** : demande ce qu'il valide (tout, une sélection de numéros d'actions, ou rien) et les informations d'identité manquantes. Ne modifie rien avant sa réponse.
 
 ## Étape 6 — Corriger (après validation)
 
@@ -217,13 +183,25 @@ Applique les corrections validées en suivant `references/corrections.md`, dans 
 
 ## Étape 7 — Retester et clôturer
 
-Relance **les mêmes tests** qu'aux étapes 2, 2 bis et 3 (scripts, relecture des textes modifiés, navigateur, en-têtes). Une correction n'est faite que si le retest le confirme. Puis mets à jour `CONFORMITE.md` en gardant la même structure :
-- déplace chaque action corrigée de « Ce qu'il reste à faire » vers « Tout ce qui est bon » (ou « Ne concerne pas votre site ») et ajoute une ligne datée dans « Ce qui a été corrigé » ;
-- mets à jour les trois nombres et le verdict de « En bref » ;
+Relance **les mêmes tests** qu'aux étapes 2, 2 bis et 3 (scripts, relecture des textes modifiés, navigateur, en-têtes, e-mail). Une correction n'est faite que si le retest le confirme. Puis mets à jour `CONFORMITE.md` en gardant la même structure :
+- passe la ligne du point corrigé à ✅ (ou ➖) dans « Le détail », retire l'action de « À faire » en renumérotant sans trou, et ajoute une ligne datée dans « Ce qui a été corrigé » ;
+- recalcule les totaux, le tableau, les notes et le verdict de « En bref », puis relance `check_report.py` ;
 - mets la preuve du retest dans la section technique repliée (par exemple « 0 requête vers google-analytics.com avant consentement ») ;
-- vérifie qu'il ne reste aucun marqueur `[À COMPLÉTER]` affiché aux visiteurs (`grep -rn "À COMPLÉTER"`) ; s'il en reste, ajoute une action « Vous » pour fournir l'information.
+- vérifie qu'il ne reste aucun marqueur `[À COMPLÉTER]` affiché aux visiteurs (`grep -rn "À COMPLÉTER"`) ; s'il en reste, ajoute une action « Vous » pour fournir l'information ;
+- mets à jour `.claude/.last-audit`.
 
 Termine par un message court : ce qui a été corrigé et vérifié, ce qui reste à fournir ou à faire, et si le site peut être mis en ligne.
+
+## Mode retest rapide
+
+Quand un audit complet a déjà été fait et que l'utilisateur demande de revérifier (le jour même, après une correction côté hébergeur, etc.) :
+
+1. Lis `.claude/.last-audit` (date, version, commit, URL testées). S'il n'existe pas, ou si la version du skill a changé, fais un audit complet.
+2. `git log --oneline <commit>..HEAD` et `git diff --name-only <commit>` (plus `git status` pour les fichiers non commités) :
+   - **aucun fichier du site modifié** (pages, composants, contenus, traductions, configuration) → **mode retest** : relance les deux analyses statiques et `extract_texts.py` seulement pour comparer les nombres, sans relecture intégrale ;
+   - **des fichiers modifiés** → relis **seulement ces fichiers** (et leurs textes) en plus des scripts.
+3. Refais **toujours** les tests en ligne et en navigateur : hébergement, DNS, en-têtes, fichiers sensibles, e-mail, cookies. Ils changent sans que le code change (réglage de l'hébergeur, DNS, prestataire d'e-mail).
+4. Dans le rapport, écris dans les détails techniques « Retest rapide du [date] : code inchangé depuis [commit] » (ou la liste des fichiers relus).
 
 ## Mode audit seul
 

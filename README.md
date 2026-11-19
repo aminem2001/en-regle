@@ -9,7 +9,7 @@ RGPD · Cookies CNIL · Mentions légales · CGV · Accessibilité RGAA · DSA �
 
 ![Claude Code](https://img.shields.io/badge/Claude_Code-skill-D97757)
 ![France · UE](https://img.shields.io/badge/droit-France_%C2%B7_UE-0055A4)
-![45 points](https://img.shields.io/badge/grille-45_points-2EA44F)
+![52 points](https://img.shields.io/badge/grille-52_points-2EA44F)
 ![OWASP 2025](https://img.shields.io/badge/OWASP-Top_10_2025-000000)
 ![Licence MIT](https://img.shields.io/badge/licence-MIT-lightgrey)
 
@@ -73,7 +73,7 @@ Puis il te remet un rapport `CONFORMITE.md` **lisible sans être développeur ni
 
 Tu dis « corrige 1 à 4 » ou « corrige tout », et il applique, reteste et met le rapport à jour.
 
-## 🧾 La grille : 45 points
+## 🧾 La grille : 52 points
 
 <table>
 <tr><td>
@@ -120,7 +120,24 @@ Tu dis « corrige 1 à 4 » ou « corrige tout », et il applique, reteste et me
 - Sécurité des fonctionnalités IA
 
 </td></tr>
+<tr><td>
+
+**🖥️ Hébergement & prestataires**
+- Offre gratuite autorisée pour un pro ? *(Vercel Hobby : non)*
+- Contrat de protection des données (DPA)
+- Hébergeur annoncé = hébergeur réel *(testé en ligne)*
+
+</td><td>
+
+**✉️ E-mail**
+- L'adresse de contact reçoit vraiment
+- SPF · DKIM · DMARC · service de redirection
+- Pas de spams · envois du formulaire vérifiés
+
+</td></tr>
 </table>
+
+Le rapport final est écrit **pour le propriétaire du site, pas pour un développeur** : 9 catégories en mots de tous les jours, chaque point sur sa ligne avec ✅ bon · 🟠 moyen · ❌ pas bon · ❓ à vérifier · ➖ pas concerné, une note sur 10 par catégorie et une liste « À faire » numérotée. Le jargon reste dans un bloc replié pour le développeur.
 
 Et selon ton projet : **App Store / Google Play**, **DSA** (contenus d'utilisateurs, marketplaces), **AI Act** (chatbots), et les lois de **13 pays et régions** hors UE (Royaume-Uni, Suisse, Californie, Québec, Brésil, Inde…).
 
@@ -154,7 +171,7 @@ Tu peux aussi donner **ta propre checklist** : il l'utilise comme structure du r
 
 ## 🛠️ Sous le capot
 
-Six outils, **zéro dépendance** (Python 3.8+ / Node 18+), plus un test Playwright optionnel :
+Neuf outils, **zéro dépendance** (Python 3.8+ / Node 18+), plus un test Playwright optionnel :
 
 | Outil | Ce qu'il vérifie |
 |---|---|
@@ -162,10 +179,13 @@ Six outils, **zéro dépendance** (Python 3.8+ / Node 18+), plus un test Playwri
 | `audit_static.py` | Accessibilité, OWASP, secrets, dark patterns, allégations, e-mails, licences |
 | `browser_probe.js` | Dans la page : cookies, requêtes tierces, bandeau, contrastes, accessibilité |
 | `live_check.mjs` | Navigateur réel : avant / après « Refuser », clavier, axe-core, captures |
-| `check_headers.py` | HTTPS, en-têtes de sécurité, cookies, fichiers sensibles exposés |
+| `check_headers.py` | HTTPS (avec et sans www), en-têtes, cookies, hébergeur réel et IP contactée, fichiers sensibles, plantages sur adresses inconnues |
+| `check_email.py` | MX, SPF, DKIM, DMARC, service de redirection des e-mails |
+| `extract_texts.py` | Tous les textes visibles, pour une relecture intégrale |
+| `check_report.py` | Le rapport tombe juste : totaux, numérotation, jargon |
 | `contrast.py` | Ratio WCAG et couleur conforme la plus proche |
 
-Plus **8 modèles de pages** (mentions légales, confidentialité, cookies, CGV, CGU, retours, accessibilité, spécification du bandeau) que Claude **adapte à ton projet réel**. Pas de copier-coller générique.
+Plus **9 modèles** : le rapport, et 8 pages (mentions légales, confidentialité, cookies, CGV, CGU, retours, accessibilité, spécification du bandeau) que Claude **adapte à ton projet réel**. Pas de copier-coller générique.
 
 ## 🔒 Ses règles d'or
 

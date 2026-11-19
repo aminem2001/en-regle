@@ -98,6 +98,16 @@ En-têtes selon l'hébergeur :
 - **Express** : `helmet`.
 - **Django** : `SECURE_*` dans les réglages, `django-csp`.
 - **Laravel** : middleware dédié.
+**Redirection `http://` → `https://`** (toutes les variantes : avec et sans `www`) :
+- **Cloudflare** : *SSL/TLS > Edge Certificates > Always Use HTTPS* ; pour `www` → adresse principale, une règle de redirection (*Rules > Redirect Rules*) et un enregistrement DNS `www` proxifié.
+- **Vercel, Netlify, GitHub Pages** (HTTPS forcé coché), **Firebase** : automatique ; ajouter le domaine `www` et le faire rediriger vers l'adresse principale dans les réglages de domaine.
+- **Nginx** : bloc `server { listen 80; server_name exemple.fr www.exemple.fr; return 301 https://exemple.fr$request_uri; }`.
+- **Apache** : `.htaccess` avec `RewriteCond %{HTTPS} off` puis `RewriteRule ^ https://exemple.fr%{REQUEST_URI} [L,R=301]`.
+- **Next.js** (`middleware.ts` / `proxy.ts`) : en dernier recours seulement, si l'hébergeur ne le fait pas.
+- HSTS seul ne protège pas la toute première visite : ajouter `preload` et inscrire le domaine sur hstspreload.org quand tous les sous-domaines sont en HTTPS.
+
+**Adresses inconnues qui font planter le site** (`check_headers.py --probe-files` signale une 5xx ou une lenteur) : répondre 404 tout de suite aux chemins de fichiers inconnus (`/.git/*`, `*.php`, `*.env`, `*.yml`) avant tout traitement (middleware, règle de l'hébergeur ou du pare-feu), et ne pas déclencher d'alerte pour ces 404.
+
 Commencer la CSP en mode `Content-Security-Policy-Report-Only` si le site charge beaucoup de tiers, puis passer en mode bloquant.
 
 Autres corrections : voir `securite-owasp.md` (chaque point a sa section « Corriger »). Pour une clé exposée : **demander à l'utilisateur de la révoquer** chez le fournisseur, puis la déplacer en variable d'environnement serveur.
@@ -109,3 +119,16 @@ Dépendances : `npm audit fix` (sans `--force`) ; les montées de version majeur
 - Gabarits marketing (dossiers `emails/`, `templates/`, React Email, MJML, outils comme Brevo ou Mailchimp) : lien de désinscription en un clic + en-tête `List-Unsubscribe` (et `List-Unsubscribe-Post`) côté envoi.
 - Identité et adresse de l'expéditeur dans le pied de l'e-mail.
 - E-mails transactionnels (confirmation de commande) : pas de lien de désinscription requis, mais ne pas y glisser de prospection sans consentement.
+
+**L'adresse de contact ne reçoit rien** (`check_email.py` : pas de MX) : créer la boîte chez l'hébergeur d'e-mail, ou une redirection (Cloudflare Email Routing, redirection du registrar) vers la boîte réelle ; puis citer ce service et la boîte de réception dans la politique de confidentialité.
+
+**Le formulaire dit « envoyé » mais rien n'arrive** :
+- vérifier dans le code la réponse du service d'envoi (Resend renvoie `{ data, error }` sans lever d'erreur ; `fetch` ne lève rien sur une 4xx/5xx) et afficher une erreur au visiteur si l'envoi échoue ;
+- regarder la **liste de blocage** du service d'envoi : après un rebond (adresse inexistante pendant un changement de DNS, boîte pleine), l'adresse y est ajoutée et plus rien ne part (Resend > Emails > Suppressions ; équivalent chez Brevo, Postmark, SendGrid) ; retirer l'adresse une fois le problème réglé ;
+- vérifier le quota de l'offre gratuite (Resend : 100 e-mails par jour) : des alertes en boucle peuvent l'épuiser.
+
+**Les e-mails du site arrivent dans les spams** (domaine neuf, redirection) — ce n'est pas un point légal, mais un délai de réponse promis sur le site devient intenable :
+- SPF (un seul enregistrement, `~all` ou `-all`), DKIM du service d'envoi, DMARC : commencer par `p=none; rua=mailto:…` (rapports), puis `p=quarantine` quand tout est aligné ;
+- dans Gmail, créer un filtre « De : @domaine → Ne jamais envoyer dans le spam » ;
+- répondre depuis l'adresse du domaine (Gmail « Envoyer en tant que » avec le SMTP du service d'envoi) plutôt que depuis l'adresse Gmail ;
+- éviter les messages de test « bidon » (« test test », liens raccourcis) qui ressemblent à du spam.

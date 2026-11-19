@@ -56,7 +56,8 @@ Durées de conservation courantes (référentiels CNIL, à adapter) :
 
 À signaler dans la section « Hors code » du rapport :
 - **Registre des traitements** (art. 30) : la CNIL fournit un modèle. L'exemption pour les structures de moins de 250 salariés est très étroite ; recommande-le toujours.
-- **Contrats avec les sous-traitants** (art. 28) : hébergeur, outils SaaS. La plupart proposent un DPA (Data Processing Agreement) à accepter.
+- **Contrats avec les sous-traitants** (art. 28) : hébergeur, outils SaaS. La plupart proposent un DPA (Data Processing Agreement) à accepter. **Attention aux offres gratuites** : le DPA peut ne couvrir que les offres payantes (Vercel), et une boîte Gmail gratuite n'en a pas (voir `hebergeurs.md`).
+- **Liste des destinataires = prestataires réels** : hébergeur réellement utilisé, service de redirection des e-mails (MX), service d'envoi, boîte de réception, API appelées. Un prestataire oublié ou un ancien prestataire encore cité rend la politique inexacte.
 - **Sécurité** (art. 32) : HTTPS partout, mots de passe hachés (bcrypt, argon2), politique de mot de passe conforme à la recommandation CNIL, sauvegardes, contrôle d'accès, mises à jour.
 - **Violation de données** (art. 33 et 34) : notification à la CNIL sous **72 heures**, information des personnes si risque élevé ; tenir un registre des violations.
 - **Analyse d'impact (AIPD)** (art. 35) : données sensibles à grande échelle, surveillance systématique, profilage, données de personnes vulnérables, etc.

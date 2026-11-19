@@ -157,6 +157,23 @@ EMAIL_HINT = re.compile(r"(email|mail|newsletter|campaign|marketing)", re.I)
 UNSUB = re.compile(r"unsubscribe|d[ée]sinscri|d[ée]sabonn|se d[ée]sinscrire|List-Unsubscribe|\{\{\s*unsubscribe|\*\|UNSUB\|\*|\[unsubscribe\]", re.I)
 MARKETING_HINT = re.compile(r"promo|offre|newsletter|nouveaut|soldes|discount|campaign|marketing|r[ée]duction|-\d+\s?%", re.I)
 FONT_PRO = re.compile(r"@fortawesome/(pro-|fontawesome-pro)|kit\.fontawesome\.com|use\.typekit\.net|fonts\.adobe\.com", re.I)
+# Hébergement serverless / edge : un compteur en mémoire n'est pas partagé entre les instances
+SERVERLESS_FILES = ["vercel.json", ".vercel", "netlify.toml", "wrangler.toml", "wrangler.json", "wrangler.jsonc",
+                    "serverless.yml", "serverless.yaml", "amplify.yml", "open-next.config.ts", "firebase.json",
+                    "staticwebapp.config.json", "template.yaml"]
+SERVERLESS_DEPS = re.compile(r'"(@opennextjs/cloudflare|@cloudflare/next-on-pages|@cloudflare/workers-types|@vercel/[\w-]+|@netlify/[\w-]+|@astrojs/(vercel|netlify|cloudflare)|@sveltejs/adapter-(vercel|netlify|cloudflare)|hono|serverless-http)"')
+MEM_COUNTER = re.compile(r"new\s+Map\s*(<[^>]*>)?\s*\(", re.I)
+RATE_HINT = re.compile(r"rate|limit|throttl|attempt|hits|quota|cooldown|lastSent|last_sent|lastAlert", re.I)
+NOW_HINT = re.compile(r"Date\.now\(\)|performance\.now\(\)|new Date\(\)\.getTime\(\)")
+ERROR_HOOK = re.compile(r"\bonRequestError\b|process\.on\(\s*['\"](uncaughtException|unhandledRejection)|@app\.errorhandler|rescue_from\b|set_exception_handler\(|app\.use\(\s*\(?\s*err\b|addEventListener\(\s*['\"]error['\"]")
+EMAIL_SEND = re.compile(r"\.emails\.send\(|\bsendMail\(|sgMail\.send\(|postmark|send_mail\(|Mail::to\(|ActionMailer|fetch\(\s*['\"`]https://api\.(resend\.com|brevo\.com|sendgrid\.com|postmarkapp\.com|mailgun\.net|mailjet\.com)", re.I)
+ALERT_HINT = re.compile(r"alert|alerte|notif|incident|monitor", re.I)
+NOISE_FILTER = re.compile(r"NEXT_NOT_FOUND|NEXT_HTTP_ERROR_FALLBACK|NEXT_REDIRECT|isNotFoundError|\b404\b|notFound|status(Code)?\s*[<>]=?\s*500|>=\s*500", re.I)
+RESEND_SDK = re.compile(r"\.emails\.send\(")
+RESEND_CHECKED = re.compile(r"\{[^}]*\berror\b[^}]*\}\s*=\s*await|\.error\b|if\s*\(\s*!?\s*error\b|throwOnError")
+MAIL_API_FETCH = re.compile(r"fetch\(\s*['\"`]https://api\.(resend\.com|brevo\.com|sendgrid\.com|postmarkapp\.com|mailgun\.net|mailjet\.com)")
+FETCH_CHECKED = re.compile(r"\.ok\b|\.status\b|raise_for_status")
+TEXT_ONLY = {".md", ".mdx", ".txt", ".json", ".yml", ".yaml", ".toml", ".xml", ".csv"}
 RISKY_LICENSES = re.compile(r"\b(A?GPL|LGPL|SSPL|BUSL|CC-BY-NC|UNLICENSED|Commercial|Proprietary)\b", re.I)
 
 
@@ -297,6 +314,13 @@ def audit(root, max_per_rule):
     files_scanned = 0
     has_focus_visible = False
     safe_jsonld = []
+    mem_counters, error_hooks, alert_senders, unchecked_sends = [], [], [], []
+    serverless = [f for f in SERVERLESS_FILES if os.path.exists(os.path.join(root, f))]
+    pj = os.path.join(root, "package.json")
+    if os.path.isfile(pj):
+        m = SERVERLESS_DEPS.search(open(pj, encoding="utf-8", errors="ignore").read())
+        if m:
+            serverless.append(m.group(1))
 
     gi = os.path.join(root, ".gitignore")
     if os.path.isfile(gi):
@@ -362,6 +386,18 @@ def audit(root, max_per_rule):
                     if len(f["occurrences"]) < max_per_rule:
                         f["occurrences"].append({"fichier": rel, "ligne": i, "extrait": original_lines[i - 1].strip()[:160]})
 
+        # Limitation anti-abus en mémoire, alertes par e-mail, envoi non vérifié (code seulement)
+        if ext not in TEXT_ONLY:
+            if MEM_COUNTER.search(content) and NOW_HINT.search(content) and RATE_HINT.search(content):
+                mem_counters.append(rel)
+            if ERROR_HOOK.search(content):
+                error_hooks.append((rel, content))
+            if EMAIL_SEND.search(content) and (ALERT_HINT.search(rel) or ERROR_HOOK.search(content)):
+                alert_senders.append((rel, content))
+            if (RESEND_SDK.search(content) and not RESEND_CHECKED.search(content)) or \
+                    (MAIL_API_FETCH.search(content) and not FETCH_CHECKED.search(content)):
+                unchecked_sends.append(rel)
+
         # E-mails marketing sans lien de désinscription
         if EMAIL_HINT.search(rel) and ext in {".html", ".htm", ".tsx", ".jsx", ".mjml", ".hbs", ".handlebars", ".njk", ".ejs", ".liquid", ".twig", ".vue",
                                          ".erb", ".cshtml", ".razor", ".jinja", ".jinja2", ".j2", ".mustache", ".eex", ".heex", ".ftl", ".jsp"}:
@@ -406,6 +442,29 @@ def audit(root, max_per_rule):
         extra.append({"point": "S5", "gravite": "info",
                       "constat": "Données structurées JSON-LD insérées en HTML brut mais échappées (JSON.stringify + remplacement de « < ») : sûr si le contenu n'est pas fourni par un visiteur",
                       "occurrences": safe_jsonld[:10]})
+    if mem_counters:
+        if serverless:
+            extra.append({"point": "S13", "gravite": "moyenne",
+                          "constat": f"Limitation anti-abus en mémoire (Map + horodatage) sur un hébergement serverless/edge ({', '.join(serverless[:3])}) : chaque instance a son propre compteur, la limite est contournable. Utiliser un stockage partagé (KV, Durable Objects, Upstash, Redis) ou la règle de limitation de l'hébergeur (Cloudflare Rate Limiting, Vercel Firewall)",
+                          "occurrences": mem_counters[:10]})
+        else:
+            extra.append({"point": "S13", "gravite": "info",
+                          "constat": "Limitation anti-abus en mémoire : suffisante sur un seul serveur, contournable s'il y a plusieurs instances ou un hébergement serverless",
+                          "occurrences": mem_counters[:10]})
+    if alert_senders and error_hooks:
+        joined = "\n".join(c for _, c in error_hooks + alert_senders)
+        problems = []
+        if not NOISE_FILTER.search(joined):
+            problems.append("les 404 et redirections ne semblent pas ignorées (NEXT_NOT_FOUND, NEXT_HTTP_ERROR_FALLBACK, NEXT_REDIRECT, statut < 500)")
+        if serverless and any(MEM_COUNTER.search(c) or re.search(r"(let|var)\s+\w*(last|Last)\w*\s*=", c) for _, c in alert_senders):
+            problems.append("la limite d'envoi est en mémoire, donc non partagée entre les instances serverless")
+        extra.append({"point": "S9", "gravite": "moyenne" if problems else "info",
+                      "constat": "Alerte par e-mail sur erreur serveur : " + ("; ".join(problems) + " → un robot peut déclencher des centaines d'e-mails, épuiser le quota du service d'envoi et faire bloquer l'adresse" if problems else "vérifier qu'elle ignore les 404, qu'elle est limitée de façon partagée et qu'elle ne contient pas de données personnelles"),
+                      "occurrences": sorted({r for r, _ in error_hooks + alert_senders})[:10]})
+    if unchecked_sends:
+        extra.append({"point": "E4", "gravite": "moyenne",
+                      "constat": "Envoi d'e-mail dont le résultat ne semble pas vérifié (Resend renvoie { error } sans lever d'exception ; fetch ne lève rien sur une erreur 4xx/5xx) : le formulaire peut afficher « envoyé » alors que rien n'est parti",
+                      "occurrences": unchecked_sends[:10]})
     if deps:
         extra.append({"point": "24", "gravite": "moyenne",
                       "constat": "Dépendances avec une licence contraignante ou absente (GPL/AGPL/non commerciale/aucune)",
